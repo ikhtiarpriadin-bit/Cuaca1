@@ -7,9 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import android.util.Log
+import com.example.cuaca1.api.RetrofitClient
+import com.example.cuaca1.model.WeatherResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : androidx.activity.ComponentActivity() {
 
+    private val API_KEY = "277e22a7fbc5477aedc466d91c974316"
 
     // 1. Deklarasi Komponen UI Utama (Atas)
     private lateinit var ivBackground: ImageView
@@ -52,27 +59,45 @@ class MainActivity : androidx.activity.ComponentActivity() {
         tvVisibility = findViewById(R.id.tvVisibility)
 
         // 5. Jalankan Pengisian Data Cuaca
-        tampilkanDataCuaca()
+        ambilDataCuaca()
     }
 
     /**
      * Fungsi untuk mengisi semua teks cuaca secara dinamis
      */
-    private fun tampilkanDataCuaca() {
-        // Mengisi Informasi Atas
-        tvLocation.text = "Banjarmasin"
-        tvTemperature.text = "30°"
-        tvCondition.text = "Cerah Berawan"
-        tvFeelsLike.text = "Terasa seperti 33°C | Kelembaban Tinggi"
+    private fun ambilDataCuaca() {
 
-        // Mengisi 5 Fitur Baru di Dalam CardView
-        tvHumidity.text = "72%"
-        tvWind.text = "10 km/h"
-        tvUV.text = "4 (Sedang)"
-        tvPressure.text = "1011 hPa"
-        tvVisibility.text = "9 km"
+        RetrofitClient.api.getWeather(
+            lat = -3.3162,
+            lon = 114.5938,
+            apiKey = API_KEY
+        ).enqueue(object : Callback<WeatherResponse> {
 
-        // Mengunci background agar menggunakan gambar sun.png Anda
-        ivBackground.setImageResource(R.drawable.sun)
+            override fun onResponse(
+                call: Call<WeatherResponse>,
+                response: Response<WeatherResponse>
+            ) {
+
+                if (response.isSuccessful && response.body() != null) {
+
+                    val data = response.body()!!
+
+                    Log.d("CUACA", data.name)
+                    Log.d("CUACA", data.main.temp.toString())
+                    Log.d("CUACA", data.weather[0].description)
+
+                }
+
+            }
+
+            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+
+                Log.e("CUACA", t.message.toString())
+
+            }
+
+        })
+
     }
+
 }

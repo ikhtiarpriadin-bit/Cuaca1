@@ -1,5 +1,3 @@
-package com.example.cuaca1.api
-
 import com.example.cuaca1.model.WeatherResponse
 import retrofit2.Call
 import retrofit2.http.GET
