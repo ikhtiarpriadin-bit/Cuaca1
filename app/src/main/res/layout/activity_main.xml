@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -7,16 +8,19 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- 1. GAMBAR LATAR BELAKANG (TETAP SAMA) -->
+    <!-- Background -->
     <ImageView
         android:id="@+id/ivBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/sun"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- 2. HEADER LOKASI (TETAP SAMA) -->
+    <!-- Lokasi -->
     <TextView
         android:id="@+id/tvLocation"
         android:layout_width="wrap_content"
@@ -26,11 +30,11 @@
         android:textColor="@android:color/white"
         android:textSize="26sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- 3. INFORMASI SUHU UTAMA (TETAP SAMA) -->
+    <!-- Suhu -->
     <TextView
         android:id="@+id/tvTemperature"
         android:layout_width="wrap_content"
@@ -41,9 +45,10 @@
         android:textColor="@android:color/white"
         android:textSize="96sp"
         android:fontFamily="sans-serif-light"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvLocation" />
+        app:layout_constraintTop_toBottomOf="@id/tvLocation"
+        app:layout_constraintStart_toStartOf="parent"/>
 
+    <!-- Kondisi -->
     <TextView
         android:id="@+id/tvCondition"
         android:layout_width="wrap_content"
@@ -52,9 +57,10 @@
         android:text="Memuat cuaca..."
         android:textColor="@android:color/white"
         android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTemperature" />
+        app:layout_constraintTop_toBottomOf="@id/tvTemperature"
+        app:layout_constraintStart_toStartOf="parent"/>
 
+    <!-- Feels Like -->
     <TextView
         android:id="@+id/tvFeelsLike"
         android:layout_width="0dp"
@@ -65,226 +71,317 @@
         android:text="Menghubungkan ke satelit GPS..."
         android:textColor="#D8FFFFFF"
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCondition"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvCondition" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- 4. KARTU DETAIL CUACA (STRUKTUR TETAP SAMA, ISI BAWAHNYA KITA TAMBAHKAN CARD) -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="320dp"
-        android:layout_margin="24dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="0dp"
-        app:cardBackgroundColor="#26FFFFFF"
+    <!-- ScrollView -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toTopOf="@+id/tvFeelsLike"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Ditambahkan ScrollView agar isi kartu detail baru di bawahnya bisa di-scroll ke bawah -->
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <LinearLayout
+            <!-- Card Informasi Cuaca -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="24dp"
+                app:cardBackgroundColor="#26FFFFFF"
+                app:cardElevation="0dp">
 
-                <!-- Sub-Header Di Dalam Kartu (TETAP SAMA) -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@android:drawable/ic_menu_today"
-                        app:tint="#B3FFFFFF" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@android:drawable/ic_menu_today"
+                            app:tint="#B3FFFFFF"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Informasi &amp; Detail Cuaca"
+                            android:textColor="#B3FFFFFF"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
+
+                    <!-- Hari Ini & Besok -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <!-- Hari Ini -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:background="#1AFFFFFF"
+                            android:padding="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Hari ini"
+                                android:textColor="@android:color/white"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="21°/36°"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:textColor="@android:color/white"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Cerah"
+                                android:textColor="#CCFFFFFF"/>
+                        </LinearLayout>
+
+                        <!-- Besok -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:background="#1AFFFFFF"
+                            android:padding="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Besok"
+                                android:textColor="@android:color/white"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="20°/38°"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:textColor="@android:color/white"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Cerah"
+                                android:textColor="#CCFFFFFF"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+            <!-- Card Humidity -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="#26FFFFFF"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="Informasi &amp; Detail Cuaca"
-                        android:textColor="#B3FFFFFF"
-                        android:textSize="14sp" />
+                        android:text="HUMIDITY"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"/>
+
+                    <TextView
+                        android:id="@+id/tvHumidity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="75%"
+                        android:textColor="@android:color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold"/>
+
                 </LinearLayout>
 
-                <!-- Grid Tampilan Hari ini & Besok (TETAP SAMA) -->
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card Wind -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="#26FFFFFF"
+                app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <!-- Informasi Hari Ini (TETAP SAMA) -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:background="#1AFFFFFF"
-                        android:padding="12dp"
-                        android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hari ini" android:textColor="@android:color/white" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="21°/36°" android:textStyle="bold" android:textSize="16sp" android:textColor="@android:color/white" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cerah" android:textColor="#CCFFFFFF" />
-                    </LinearLayout>
+                        android:text="WIND"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"/>
 
-                    <!-- Informasi Besok (TETAP SAMA) -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvWind"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:background="#1AFFFFFF"
-                        android:padding="12dp"
-                        android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Besok" android:textColor="@android:color/white" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="20°/38°" android:textStyle="bold" android:textSize="16sp" android:textColor="@android:color/white" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cerah" android:textColor="#CCFFFFFF" />
-                    </LinearLayout>
+                        android:layout_marginTop="6dp"
+                        android:text="12 km/h"
+                        android:textColor="@android:color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold"/>
+
                 </LinearLayout>
 
-                <!-- ======================================================== -->
-                <!-- FITUR BARU: 5 KARTU DETAIL (MASUK DI BAWAH HARI INI/BESOK) -->
-                <!-- ======================================================== -->
+            </androidx.cardview.widget.CardView>
+            <!-- Card UV Index -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="#26FFFFFF"
+                app:cardElevation="0dp">
 
-                <!-- Baris 1 Fitur: Humidity & Wind -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:background="#1AFFFFFF"
-                        android:padding="12dp"
-                        android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="HUMIDITY" android:textSize="11sp" android:textColor="#CCFFFFFF" />
-                        <TextView android:id="@+id/tvHumidity" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="75%" android:textStyle="bold" android:textSize="16sp" android:textColor="@android:color/white" />
-                    </LinearLayout>
+                        android:text="UV INDEX"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"/>
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvUV"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:background="#1AFFFFFF"
-                        android:padding="12dp"
-                        android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="WIND" android:textSize="11sp" android:textColor="#CCFFFFFF" />
-                        <TextView android:id="@+id/tvWind" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12 km/h" android:textStyle="bold" android:textSize="16sp" android:textColor="@android:color/white" />
-                    </LinearLayout>
+                        android:layout_marginTop="6dp"
+                        android:text="3 (Moderate)"
+                        android:textColor="@android:color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold"/>
+
                 </LinearLayout>
 
-                <!-- Baris 2 Fitur: UV Index & Pressure -->
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card Pressure -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="#26FFFFFF"
+                app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <!-- UV Index -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:background="#1AFFFFFF"
-                        android:padding="12dp"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="UV INDEX"
-                            android:textSize="11sp"
-                            android:textColor="#CCFFFFFF" />
-                        <TextView
-                            android:id="@+id/tvUV"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="3 (Mod)"
-                            android:textStyle="bold"
-                            android:textSize="16sp"
-                            android:textColor="@android:color/white" />
-                    </LinearLayout>
+                        android:text="PRESSURE"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"/>
 
-                    <!-- Pressure -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvPressure"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:background="#1AFFFFFF"
-                        android:padding="12dp"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="PRESSURE"
-                            android:textSize="11sp"
-                            android:textColor="#CCFFFFFF" />
-                        <TextView
-                            android:id="@+id/tvPressure"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1012 hPa"
-                            android:textStyle="bold"
-                            android:textSize="16sp"
-                            android:textColor="@android:color/white" />
-                    </LinearLayout>
+                        android:layout_marginTop="6dp"
+                        android:text="1012 hPa"
+                        android:textColor="@android:color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold"/>
+
                 </LinearLayout>
 
-                <!-- Baris 3 Fitur: Visibility -->
+            </androidx.cardview.widget.CardView>
+            <!-- Card Visibility -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="#26FFFFFF"
+                app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <!-- Visibility -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:background="#1AFFFFFF"
-                        android:padding="12dp"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="VISIBILITY"
-                            android:textSize="11sp"
-                            android:textColor="#CCFFFFFF" />
-                        <TextView
-                            android:id="@+id/tvVisibility"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="10 km"
-                            android:textStyle="bold"
-                            android:textSize="16sp"
-                            android:textColor="@android:color/white" />
-                    </LinearLayout>
+                        android:text="VISIBILITY"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"/>
 
-                    <!-- Sisi Kanan Dikosongkan Menggunakan View Transparan Agar Seimbang -->
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"/>
+                    <TextView
+                        android:id="@+id/tvVisibility"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="10 km"
+                        android:textColor="@android:color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold"/>
+
                 </LinearLayout>
 
-            </LinearLayout>
-        </ScrollView>
-    </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
