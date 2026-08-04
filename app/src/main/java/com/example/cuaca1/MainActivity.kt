@@ -86,7 +86,6 @@ class MainActivity : AppCompatActivity() {
         // Hubungkan ID XML 5 Fitur Baru
         tvHumidity = findViewById(R.id.tvHumidity)
         tvWind = findViewById(R.id.tvWind)
-        tvUV = findViewById(R.id.tvUV)
         tvPressure = findViewById(R.id.tvPressure)
         tvVisibility = findViewById(R.id.tvVisibility)
 
@@ -163,29 +162,67 @@ class MainActivity : AppCompatActivity() {
 
                     val data = response.body()!!
 
-                    // Ambil deskripsi cuaca secara aman
-                    val weatherCondition = data.weather.firstOrNull()?.description ?: "-"
+                    val weather = data.weather.firstOrNull()
 
-                    // Tampilkan ke Logcat
+                    val weatherMain = weather?.main ?: "Clear"
+
+                    val weatherDescription = weather?.description ?: "-"
+
+                    // Log
                     Log.d("CUACA", "Kota: ${data.name}")
                     Log.d("CUACA", "Suhu: ${data.main.temp}")
-                    Log.d("CUACA", "Deskripsi: $weatherCondition")
+                    Log.d("CUACA", "Deskripsi: $weatherDescription")
 
-                    // Update UI Utama
+                    // =========================
+                    // UPDATE UI
+                    // =========================
+
                     tvLocation.text = data.name
+
                     tvTemperature.text = "${data.main.temp.toInt()}°C"
-                    tvCondition.text = weatherCondition
-                    // Menggunakan feelsLike (bukan feels_like)
+
+                    tvCondition.text = weatherDescription.replaceFirstChar {
+                        it.uppercase()
+                    }
+
                     tvFeelsLike.text = "Feels like ${data.main.feelsLike.toInt()}°C"
 
-                    // Update UI 5 Fitur Baru
                     tvHumidity.text = "${data.main.humidity}%"
+
                     tvWind.text = "${data.wind.speed} m/s"
+
                     tvPressure.text = "${data.main.pressure} hPa"
+
                     tvVisibility.text = "${data.visibility / 1000} km"
 
+
+                    // =========================
+                    // GANTI BACKGROUND
+                    // =========================
+
+                    when (weatherMain) {
+
+                        "Clear" -> {
+                            ivBackground.setImageResource(R.drawable.sun)
+                        }
+
+                        "Clouds" -> {
+                            ivBackground.setImageResource(R.drawable.cloud)
+                        }
+
+                        "Rain" -> {
+                            ivBackground.setImageResource(R.drawable.rain)
+                        }
+
+                        else -> {
+                            ivBackground.setImageResource(R.drawable.sun)
+                        }
+                    }
+
                 } else {
+
                     Log.e("CUACA", "Error Response: ${response.code()}")
+
                 }
 
             }

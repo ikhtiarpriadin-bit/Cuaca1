@@ -273,41 +273,6 @@
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
-            <!-- Card UV Index -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="#26FFFFFF"
-                app:cardElevation="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="UV INDEX"
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="12sp"/>
-
-                    <TextView
-                        android:id="@+id/tvUV"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="3 (Moderate)"
-                        android:textColor="@android:color/white"
-                        android:textSize="24sp"
-                        android:textStyle="bold"/>
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
 
             <!-- Card Pressure -->
             <androidx.cardview.widget.CardView
