@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <style name="Theme.Cuaca1" parent="android:Theme.Material.Light.NoActionBar" />
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Pastikan parent menginduk ke AppCompat / MaterialComponents -->
+    <style name="Theme.Cuaca1" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Tambahkan warna/konfigurasi kustom kamu di sini jika ada -->
+    </style>
 </resources>
