@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     // Deklarasi Komponen UI Utama
     private lateinit var ivBackground: ImageView
+    private lateinit var ivWeatherIcon: ImageView
     private lateinit var tvLocation: TextView
     private lateinit var tvTemperature: TextView
     private lateinit var tvCondition: TextView
@@ -78,6 +79,7 @@ class MainActivity : AppCompatActivity() {
 
         // Hubungkan ID XML Utama
         ivBackground = findViewById(R.id.ivBackground)
+        ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
         tvLocation = findViewById(R.id.tvLocation)
         tvTemperature = findViewById(R.id.tvTemperature)
         tvCondition = findViewById(R.id.tvCondition)
@@ -231,18 +233,22 @@ class MainActivity : AppCompatActivity() {
 
             "Clear" -> {
                 ivBackground.setImageResource(R.drawable.sun)
+                ivWeatherIcon.setImageResource(R.drawable.ic_sun)
             }
 
             "Clouds" -> {
                 ivBackground.setImageResource(R.drawable.cloud)
+                ivWeatherIcon.setImageResource(R.drawable.ic_cloud)
             }
 
             "Rain" -> {
                 ivBackground.setImageResource(R.drawable.rain)
+                ivWeatherIcon.setImageResource(R.drawable.ic_rain)
             }
 
             else -> {
                 ivBackground.setImageResource(R.drawable.sun)
+                ivWeatherIcon.setImageResource(R.drawable.ic_sun)
             }
 
         }

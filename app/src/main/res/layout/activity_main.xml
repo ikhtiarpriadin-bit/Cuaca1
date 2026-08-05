@@ -48,6 +48,17 @@
         app:layout_constraintTop_toBottomOf="@id/tvLocation"
         app:layout_constraintStart_toStartOf="parent"/>
 
+    <ImageView
+        android:id="@+id/ivWeatherIcon"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="Weather Icon"
+        android:src="@drawable/ic_sun"
+        app:layout_constraintStart_toEndOf="@id/tvTemperature"
+        app:layout_constraintBottom_toBottomOf="@id/tvTemperature"
+        app:layout_constraintTop_toTopOf="@id/tvTemperature"/>
+
     <!-- Kondisi -->
     <TextView
         android:id="@+id/tvCondition"
@@ -97,8 +108,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
                 app:cardBackgroundColor="#26FFFFFF"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
@@ -110,14 +121,14 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <ImageView
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:src="@android:drawable/ic_menu_today"
-                            app:tint="#B3FFFFFF"/>
+                            app:tint="#B3FFFFFF" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -125,7 +136,7 @@
                             android:layout_marginStart="8dp"
                             android:text="Informasi &amp; Detail Cuaca"
                             android:textColor="#B3FFFFFF"
-                            android:textSize="14sp"/>
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <!-- Hari Ini & Besok -->
@@ -139,62 +150,63 @@
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
                             android:background="#1AFFFFFF"
-                            android:padding="12dp"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Hari ini"
-                                android:textColor="@android:color/white"/>
+                                android:textColor="@android:color/white" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="21°/36°"
-                                android:textStyle="bold"
+                                android:textColor="@android:color/white"
                                 android:textSize="16sp"
-                                android:textColor="@android:color/white"/>
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Cerah"
-                                android:textColor="#CCFFFFFF"/>
+                                android:textColor="#CCFFFFFF" />
+
                         </LinearLayout>
 
                         <!-- Besok -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginStart="8dp"
+                            android:layout_weight="1"
                             android:background="#1AFFFFFF"
-                            android:padding="12dp"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Besok"
-                                android:textColor="@android:color/white"/>
+                                android:textColor="@android:color/white" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="20°/38°"
-                                android:textStyle="bold"
+                                android:textColor="@android:color/white"
                                 android:textSize="16sp"
-                                android:textColor="@android:color/white"/>
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Cerah"
-                                android:textColor="#CCFFFFFF"/>
+                                android:textColor="#CCFFFFFF" />
                         </LinearLayout>
 
                     </LinearLayout>
