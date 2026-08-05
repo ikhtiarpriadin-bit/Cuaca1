@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- Background -->
+    <!-- 1. Gambar Background -->
     <ImageView
         android:id="@+id/ivBackground"
         android:layout_width="match_parent"
@@ -20,7 +20,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Lokasi -->
+    <!-- 2. OVERLAY GELAP (Penyelamat agar Teks Tidak Tabrakan) -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_overlay"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <!-- 3. Lokasi -->
     <TextView
         android:id="@+id/tvLocation"
         android:layout_width="wrap_content"
@@ -34,13 +42,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Suhu -->
+    <!-- 4. Suhu Utama -->
     <TextView
         android:id="@+id/tvTemperature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:text="--°"
         android:textColor="@android:color/white"
         android:textSize="80sp"
@@ -59,7 +67,7 @@
         app:layout_constraintBottom_toBottomOf="@id/tvTemperature"
         app:layout_constraintTop_toTopOf="@id/tvTemperature"/>
 
-    <!-- Kondisi -->
+    <!-- 5. Kondisi & Feels Like -->
     <TextView
         android:id="@+id/tvCondition"
         android:layout_width="wrap_content"
@@ -68,10 +76,10 @@
         android:text="Memuat cuaca..."
         android:textColor="@android:color/white"
         android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/tvTemperature"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Feels Like -->
     <TextView
         android:id="@+id/tvFeelsLike"
         android:layout_width="0dp"
@@ -80,13 +88,13 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="24dp"
         android:text="Menghubungkan ke satelit GPS..."
-        android:textColor="#D8FFFFFF"
+        android:textColor="#E6FFFFFF"
         android:textSize="14sp"
         app:layout_constraintTop_toBottomOf="@id/tvCondition"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Forecast Per Jam Title -->
+    <!-- 6. Judul Section Per Jam -->
     <TextView
         android:id="@+id/tvHourlyTitle"
         android:layout_width="wrap_content"
@@ -100,7 +108,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvFeelsLike"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- RecyclerView Per Jam -->
+    <!-- 7. RecyclerView Per Jam -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvHourlyForecast"
         android:layout_width="0dp"
@@ -114,7 +122,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_hourly_forecast"/>
 
-    <!-- ScrollView untuk Konten Bawah -->
+    <!-- 8. ScrollView untuk Konten Bawah -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -131,164 +139,29 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Card Informasi & Forecast 5 Hari -->
+            <!-- Card Forecast 5 Hari (Ubah background agar tidak pudar) -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#26FFFFFF"
+                app:cardBackgroundColor="#40000000"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
 
-                <!-- Pembungkus Tunggal di dalam CardView -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Header Section Detail -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@android:drawable/ic_menu_today"
-                            app:tint="#B3FFFFFF" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="Informasi &amp; Detail Cuaca"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <!-- Hari Ini & Besok -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
-
-                        <!-- HARI INI -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="6dp"
-                            android:background="#1AFFFFFF"
-                            android:orientation="horizontal"
-                            android:padding="12dp"
-                            android:gravity="center_vertical">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Hari ini"
-                                    android:textColor="@android:color/white"
-                                    android:textSize="14sp"/>
-
-                                <TextView
-                                    android:id="@+id/tvTodayTemp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="21°/36°"
-                                    android:textColor="@android:color/white"
-                                    android:textStyle="bold"
-                                    android:textSize="16sp"/>
-
-                                <TextView
-                                    android:id="@+id/tvTodayStatus"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Cerah"
-                                    android:textColor="#CCFFFFFF"
-                                    android:textSize="12sp"/>
-                            </LinearLayout>
-
-                            <ImageView
-                                android:id="@+id/ivTodayIcon"
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:contentDescription="Icon Cuaca Hari Ini"
-                                android:src="@drawable/ic_sun"/>
-                        </LinearLayout>
-
-                        <!-- BESOK -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="6dp"
-                            android:background="#1AFFFFFF"
-                            android:orientation="horizontal"
-                            android:padding="12dp"
-                            android:gravity="center_vertical">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Besok"
-                                    android:textColor="@android:color/white"
-                                    android:textSize="14sp"/>
-
-                                <TextView
-                                    android:id="@+id/tvTomorrowTemp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="20°/38°"
-                                    android:textColor="@android:color/white"
-                                    android:textStyle="bold"
-                                    android:textSize="16sp"/>
-
-                                <TextView
-                                    android:id="@+id/tvTomorrowStatus"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Cerah"
-                                    android:textColor="#CCFFFFFF"
-                                    android:textSize="12sp"/>
-                            </LinearLayout>
-
-                            <ImageView
-                                android:id="@+id/ivTomorrowIcon"
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:contentDescription="Icon Cuaca Besok"
-                                android:src="@drawable/ic_sun"/>
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <!-- Title 5 Hari -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
                         android:text="Perkiraan 5 Hari"
                         android:textColor="@android:color/white"
                         android:textStyle="bold"
                         android:textSize="18sp"/>
 
-                    <!-- RecyclerView 5 Hari -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvDailyForecast"
                         android:layout_width="match_parent"
@@ -302,7 +175,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Grid Details (Humidity, Wind, Pressure, Visibility) -->
+            <!-- Grid Detail Cuaca (Humidity, Wind, dll) -->
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -316,7 +189,7 @@
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardCornerRadius="18dp"
-                    app:cardBackgroundColor="#26FFFFFF"
+                    app:cardBackgroundColor="#40000000"
                     app:cardElevation="0dp">
 
                     <LinearLayout
@@ -351,7 +224,7 @@
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardCornerRadius="18dp"
-                    app:cardBackgroundColor="#26FFFFFF"
+                    app:cardBackgroundColor="#40000000"
                     app:cardElevation="0dp">
 
                     <LinearLayout
@@ -386,7 +259,7 @@
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardCornerRadius="18dp"
-                    app:cardBackgroundColor="#26FFFFFF"
+                    app:cardBackgroundColor="#40000000"
                     app:cardElevation="0dp">
 
                     <LinearLayout
@@ -421,7 +294,7 @@
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardCornerRadius="18dp"
-                    app:cardBackgroundColor="#26FFFFFF"
+                    app:cardBackgroundColor="#40000000"
                     app:cardElevation="0dp">
 
                     <LinearLayout

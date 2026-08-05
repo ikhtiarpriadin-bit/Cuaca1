@@ -37,8 +37,6 @@ class MainActivity : AppCompatActivity() {
     // UI Utama
     private lateinit var ivBackground: ImageView
     private lateinit var ivWeatherIcon: ImageView
-    private lateinit var ivTodayIcon: ImageView
-    private lateinit var ivTomorrowIcon: ImageView
     private lateinit var tvLocation: TextView
     private lateinit var tvTemperature: TextView
     private lateinit var tvCondition: TextView
@@ -85,8 +83,6 @@ class MainActivity : AppCompatActivity() {
         // Bind View ID Utama
         ivBackground = findViewById(R.id.ivBackground)
         ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
-        ivTodayIcon = findViewById(R.id.ivTodayIcon)
-        ivTomorrowIcon = findViewById(R.id.ivTomorrowIcon)
         tvLocation = findViewById(R.id.tvLocation)
         tvTemperature = findViewById(R.id.tvTemperature)
         tvCondition = findViewById(R.id.tvCondition)
@@ -244,15 +240,5 @@ class MainActivity : AppCompatActivity() {
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
             }
         }
-
-        val icon = when (weatherMain) {
-            "Clear" -> R.drawable.ic_sun
-            "Clouds" -> R.drawable.ic_cloud
-            "Rain" -> R.drawable.ic_rain
-            else -> R.drawable.ic_sun
-        }
-
-        ivTodayIcon.setImageResource(icon)
-        ivTomorrowIcon.setImageResource(icon)
     }
 }
