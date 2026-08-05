@@ -1,6 +1,5 @@
 package com.example.cuaca1.api
 
-import CuacaApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

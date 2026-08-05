@@ -279,6 +279,6 @@ class MainActivity : AppCompatActivity() {
         ivTodayIcon.setImageResource(icon)
         ivTomorrowIcon.setImageResource(icon)
     }
-    }
+}
 
 
