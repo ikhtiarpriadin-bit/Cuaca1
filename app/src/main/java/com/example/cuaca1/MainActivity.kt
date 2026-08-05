@@ -183,18 +183,23 @@ class MainActivity : AppCompatActivity() {
                     val hourlyList = fullList.take(8)
                     rvHourlyForecast.adapter = HourlyAdapter(hourlyList)
 
-                    // Daily: Grouping berdasarkan tanggal untuk menghitung Min & Max asli
+                    // 2. SET DAILY ADAPTER (Hitung Suhu Min & Max Asli per Hari)
                     val groupedByDate = fullList.groupBy { it.dtTxt.substring(0, 10) }
                     val dailyList = mutableListOf<ForecastItem>()
 
                     for ((_, itemsInDay) in groupedByDate) {
-                        val realMinTemp = itemsInDay.minOf { it.main.tempMin }
-                        val realMaxTemp = itemsInDay.maxOf { it.main.tempMax }
+                        // Cari suhu terendah & tertinggi (aman meskipun data hari ini sisa sedikit)
+                        val realMinTemp = itemsInDay.minOfOrNull { it.main.tempMin } ?: 0.0
+                        val realMaxTemp = itemsInDay.maxOfOrNull { it.main.tempMax } ?: 0.0
 
-                        // Sampel item siang hari untuk ikon/waktu
-                        val sampleItem = itemsInDay[itemsInDay.size / 2]
+                        // Pilih item sampel: gunakan item tengah jika ada banyak data, atau item pertama jika sisa sedikit
+                        val sampleItem = if (itemsInDay.size >= 4) {
+                            itemsInDay[itemsInDay.size / 2]
+                        } else {
+                            itemsInDay.first()
+                        }
 
-                        // Copy nilai min & max baru
+                        // Copy nilai min & max yang sudah terkumpul
                         val updatedMain = sampleItem.main.copy(
                             tempMin = realMinTemp,
                             tempMax = realMaxTemp

@@ -112,10 +112,13 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvHourlyForecast"
         android:layout_width="0dp"
-        android:layout_height="110dp"
+        android:layout_height="140dp"
         android:layout_marginTop="8dp"
         android:orientation="horizontal"
         android:overScrollMode="never"
+        android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/tvHourlyTitle"
         app:layout_constraintStart_toStartOf="parent"
@@ -157,7 +160,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Perkiraan 6 Hari"
+                        android:text="Perkiraan Harian"
                         android:textColor="@android:color/white"
                         android:textStyle="bold"
                         android:textSize="18sp"/>

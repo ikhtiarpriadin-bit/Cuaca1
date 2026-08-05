@@ -17,7 +17,7 @@ class HourlyAdapter(private val list: List<ForecastItem>) :
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTime: TextView = view.findViewById(R.id.tvHourlyTime)
-        val tvTemp: TextView = view.findViewById(R.id.tvHourlyTemp)
+        val tvTemp: TextView = view.findViewById(R.id.tvHourlyTemp) // <--- Binder Suhu Jam
         val imgIcon: ImageView = view.findViewById(R.id.imgHourlyIcon)
     }
 
@@ -30,13 +30,15 @@ class HourlyAdapter(private val list: List<ForecastItem>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position]
 
-        // Format waktu per jam, misal "06:00"
+        // Format Waktu (Jam:Menit)
         val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
         val date = Date(item.dt * 1000)
         holder.tvTime.text = sdf.format(date)
 
+        // Tampilkan Angka Suhu
         holder.tvTemp.text = "${item.main.temp.toInt()}°"
 
+        // Mapping Icon Cuaca
         val iconCode = item.weather.firstOrNull()?.icon ?: ""
         holder.imgIcon.setImageResource(getWeatherIcon(iconCode))
     }

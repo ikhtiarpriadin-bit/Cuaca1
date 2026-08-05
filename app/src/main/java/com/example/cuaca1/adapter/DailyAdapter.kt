@@ -30,12 +30,23 @@ class DailyAdapter(private val list: List<ForecastItem>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position]
 
-        // Format nama hari, misal "Rabu"
-        val sdf = SimpleDateFormat("EEEE", Locale("id", "ID"))
-        val date = Date(item.dt * 1000)
-        holder.tvDay.text = sdf.format(date)
+        // Format tanggal hari ini (YYYY-MM-DD)
+        val todayDateStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val itemDateStr = item.dtTxt.substring(0, 10)
 
-        holder.tvTempMinMax.text = "${item.main.tempMin.toInt()}° / ${item.main.tempMax.toInt()}°"
+        // Ubah baris pertama menjadi "Hari Ini", baris berikutnya nama Hari (misal: "Kamis")
+        if (itemDateStr == todayDateStr || position == 0) {
+            holder.tvDay.text = "Hari Ini"
+        } else {
+            val sdfDay = SimpleDateFormat("EEEE", Locale("id", "ID"))
+            val date = Date(item.dt * 1000)
+            holder.tvDay.text = sdfDay.format(date)
+        }
+
+        // Tampilkan Min / Max dengan pembulatan toInt()
+        val minTempInt = item.main.tempMin.toInt()
+        val maxTempInt = item.main.tempMax.toInt()
+        holder.tvTempMinMax.text = "$minTempInt° / $maxTempInt°"
 
         val iconCode = item.weather.firstOrNull()?.icon ?: ""
         holder.imgIcon.setImageResource(getWeatherIcon(iconCode))
