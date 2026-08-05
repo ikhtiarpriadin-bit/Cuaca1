@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 if (location != null) {
-                    // Berhasil dapatkan lokasi nyata pengguna
+                    // dapatkan lokasi nyata pengguna
                     Log.d("GPS", "Lat: ${location.latitude}, Lon: ${location.longitude}")
                     ambilDataCuaca(location.latitude, location.longitude)
                 } else {
@@ -173,51 +173,8 @@ class MainActivity : AppCompatActivity() {
                     Log.d("CUACA", "Suhu: ${data.main.temp}")
                     Log.d("CUACA", "Deskripsi: $weatherDescription")
 
-                    // =========================
-                    // UPDATE UI
-                    // =========================
-
-                    tvLocation.text = data.name
-
-                    tvTemperature.text = "${data.main.temp.toInt()}°C"
-
-                    tvCondition.text = weatherDescription.replaceFirstChar {
-                        it.uppercase()
-                    }
-
-                    tvFeelsLike.text = "Feels like ${data.main.feelsLike.toInt()}°C"
-
-                    tvHumidity.text = "${data.main.humidity}%"
-
-                    tvWind.text = "${data.wind.speed} m/s"
-
-                    tvPressure.text = "${data.main.pressure} hPa"
-
-                    tvVisibility.text = "${data.visibility / 1000} km"
-
-
-                    // =========================
-                    // GANTI BACKGROUND
-                    // =========================
-
-                    when (weatherMain) {
-
-                        "Clear" -> {
-                            ivBackground.setImageResource(R.drawable.sun)
-                        }
-
-                        "Clouds" -> {
-                            ivBackground.setImageResource(R.drawable.cloud)
-                        }
-
-                        "Rain" -> {
-                            ivBackground.setImageResource(R.drawable.rain)
-                        }
-
-                        else -> {
-                            ivBackground.setImageResource(R.drawable.sun)
-                        }
-                    }
+                    updateUI(data)
+                    updateBackground(weatherMain)
 
                 } else {
 
@@ -234,5 +191,62 @@ class MainActivity : AppCompatActivity() {
         })
 
     }
+    private fun translateWeather(weather: String): String {
+        return when (weather) {
+            "Clear" -> "Cerah"
+            "Clouds" -> "Berawan"
+            "Rain" -> "Hujan"
+            "Thunderstorm" -> "Badai Petir"
+            "Drizzle" -> "Gerimis"
+            "Mist" -> "Berkabut"
+            else -> weather
+        }
+    }
+    private fun updateUI(data: WeatherResponse) {
+
+        val weather = data.weather.firstOrNull()
+
+        tvLocation.text = data.name
+
+        tvTemperature.text = "${data.main.temp.toInt()}°C"
+
+        tvCondition.text = translateWeather(weather?.main ?: "")
+
+        tvFeelsLike.text = "Terasa seperti ${data.main.feelsLike.toInt()}°C"
+
+        tvHumidity.text = "${data.main.humidity}%"
+
+        tvWind.text = "${data.wind.speed} m/s"
+
+        tvPressure.text = "${data.main.pressure} hPa"
+
+        tvVisibility.text = "${data.visibility / 1000} km"
+
+    }
+    // =========================
+    // GANTI BACKGROUND
+    // =========================
+    private fun updateBackground(weatherMain: String) {
+        when (weatherMain) {
+
+            "Clear" -> {
+                ivBackground.setImageResource(R.drawable.sun)
+            }
+
+            "Clouds" -> {
+                ivBackground.setImageResource(R.drawable.cloud)
+            }
+
+            "Rain" -> {
+                ivBackground.setImageResource(R.drawable.rain)
+            }
+
+            else -> {
+                ivBackground.setImageResource(R.drawable.sun)
+            }
+
+        }
+    }
 
 }
+
