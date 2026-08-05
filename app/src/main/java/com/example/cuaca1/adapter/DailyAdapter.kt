@@ -55,10 +55,21 @@ class DailyAdapter(private val list: List<ForecastItem>) :
     override fun getItemCount() = list.size
 
     private fun getWeatherIcon(iconCode: String): Int {
+
         return when (iconCode) {
-            "01d", "01n" -> R.drawable.ic_sun
-            "02d", "02n", "03d", "03n", "04d", "04n" -> R.drawable.ic_cloud
-            "09d", "09n", "10d", "10n", "11d", "11n" -> R.drawable.ic_rain
+
+            // Cerah
+            "01d" -> R.drawable.ic_sun
+            "01n" -> R.drawable.ic_moon
+
+            // Berawan
+            "02d", "03d", "04d" -> R.drawable.ic_cloud_sun
+            "02n", "03n", "04n" -> R.drawable.ic_cloud_moon
+
+            // Hujan
+            "09d", "09n",
+            "10d", "10n" -> R.drawable.ic_rain
+
             else -> R.drawable.ic_cloud
         }
     }

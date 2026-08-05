@@ -155,10 +155,12 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body() != null) {
                     val data = response.body()!!
                     val weather = data.weather.firstOrNull()
-                    val weatherMain = weather?.main ?: "Clear"
-
                     updateUI(data)
-                    updateBackground(weatherMain)
+
+// Ambil icon dari API (01d, 01n, 02d, dst)
+                    val iconCode = weather?.icon ?: "01d"
+
+                    updateBackground(iconCode)
                 } else {
                     Log.e("CUACA", "Error Response Current: ${response.code()}")
                 }
@@ -193,11 +195,11 @@ class MainActivity : AppCompatActivity() {
                         val realMaxTemp = itemsInDay.maxOfOrNull { it.main.tempMax } ?: 0.0
 
                         // Pilih item sampel: gunakan item tengah jika ada banyak data, atau item pertama jika sisa sedikit
-                        val sampleItem = if (itemsInDay.size >= 4) {
-                            itemsInDay[itemsInDay.size / 2]
-                        } else {
-                            itemsInDay.first()
-                        }
+                        val sampleItem =
+                            itemsInDay.find { it.dtTxt.contains("09:00:00") }
+                                ?: itemsInDay.find { it.dtTxt.contains("12:00:00") }
+                                ?: itemsInDay.find { it.dtTxt.contains("15:00:00") }
+                                ?: itemsInDay.first()
 
                         // Copy nilai min & max yang sudah terkumpul
                         val updatedMain = sampleItem.main.copy(
@@ -245,20 +247,42 @@ class MainActivity : AppCompatActivity() {
         tvVisibility.text = "${data.visibility / 1000} km"
     }
 
-    private fun updateBackground(weatherMain: String) {
-        when (weatherMain) {
-            "Clear" -> {
+    private fun updateBackground(iconCode: String) {
+
+        when (iconCode) {
+
+            // Cerah Siang
+            "01d" -> {
                 ivBackground.setImageResource(R.drawable.sun)
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
             }
-            "Clouds" -> {
-                ivBackground.setImageResource(R.drawable.cloud)
-                ivWeatherIcon.setImageResource(R.drawable.ic_cloud)
+
+            // Cerah Malam
+            "01n" -> {
+                ivBackground.setImageResource(R.drawable.night_clear)
+                ivWeatherIcon.setImageResource(R.drawable.ic_moon)
             }
-            "Rain" -> {
+
+            // Berawan Siang
+            "02d", "03d", "04d" -> {
+                ivBackground.setImageResource(R.drawable.cloud)
+                ivWeatherIcon.setImageResource(R.drawable.ic_cloud_sun)
+            }
+
+            // Berawan Malam
+            "02n", "03n", "04n" -> {
+                ivBackground.setImageResource(R.drawable.night_cloud)
+                ivWeatherIcon.setImageResource(R.drawable.ic_cloud_moon)
+            }
+
+            // Hujan
+            "09d", "09n",
+            "10d", "10n" -> {
                 ivBackground.setImageResource(R.drawable.rain)
                 ivWeatherIcon.setImageResource(R.drawable.ic_rain)
             }
+
+            // Default
             else -> {
                 ivBackground.setImageResource(R.drawable.sun)
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
