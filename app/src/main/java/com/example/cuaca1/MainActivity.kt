@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cuaca1.adapter.DailyAdapter
 import com.example.cuaca1.adapter.HourlyAdapter
 import com.example.cuaca1.api.RetrofitClient
+import com.example.cuaca1.model.ForecastItem
 import com.example.cuaca1.model.ForecastResponse
 import com.example.cuaca1.model.WeatherResponse
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -182,8 +183,26 @@ class MainActivity : AppCompatActivity() {
                     val hourlyList = fullList.take(8)
                     rvHourlyForecast.adapter = HourlyAdapter(hourlyList)
 
-                    // Daily: Ambil 1 item setiap selang 8 data (~1 hari sekali)
-                    val dailyList = fullList.filterIndexed { index, _ -> index % 8 == 0 }
+                    // Daily: Grouping berdasarkan tanggal untuk menghitung Min & Max asli
+                    val groupedByDate = fullList.groupBy { it.dtTxt.substring(0, 10) }
+                    val dailyList = mutableListOf<ForecastItem>()
+
+                    for ((_, itemsInDay) in groupedByDate) {
+                        val realMinTemp = itemsInDay.minOf { it.main.tempMin }
+                        val realMaxTemp = itemsInDay.maxOf { it.main.tempMax }
+
+                        // Sampel item siang hari untuk ikon/waktu
+                        val sampleItem = itemsInDay[itemsInDay.size / 2]
+
+                        // Copy nilai min & max baru
+                        val updatedMain = sampleItem.main.copy(
+                            tempMin = realMinTemp,
+                            tempMax = realMaxTemp
+                        )
+
+                        dailyList.add(sampleItem.copy(main = updatedMain))
+                    }
+
                     rvDailyForecast.adapter = DailyAdapter(dailyList)
 
                 } else {

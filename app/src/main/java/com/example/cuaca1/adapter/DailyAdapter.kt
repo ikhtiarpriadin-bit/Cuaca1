@@ -12,32 +12,31 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class HourlyAdapter(private val list: List<ForecastItem>) :
-    RecyclerView.Adapter<HourlyAdapter.ViewHolder>() {
+class DailyAdapter(private val list: List<ForecastItem>) :
+    RecyclerView.Adapter<DailyAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvTime: TextView = view.findViewById(R.id.tvHourlyTime)
-        val tvTemp: TextView = view.findViewById(R.id.tvHourlyTemp)
-        val imgIcon: ImageView = view.findViewById(R.id.imgHourlyIcon)
+        val tvDay: TextView = view.findViewById(R.id.tvDailyDay)
+        val tvTempMinMax: TextView = view.findViewById(R.id.tvDailyTemp)
+        val imgIcon: ImageView = view.findViewById(R.id.imgDailyIcon)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_hourly_forecast, parent, false)
+            .inflate(R.layout.item_daily_forecast, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position]
 
-        // Format waktu misal "06:00"
-        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        // Format nama hari, misal "Rabu"
+        val sdf = SimpleDateFormat("EEEE", Locale("id", "ID"))
         val date = Date(item.dt * 1000)
-        holder.tvTime.text = sdf.format(date)
+        holder.tvDay.text = sdf.format(date)
 
-        holder.tvTemp.text = "${item.main.temp.toInt()}°"
+        holder.tvTempMinMax.text = "${item.main.tempMin.toInt()}° / ${item.main.tempMax.toInt()}°"
 
-        // Mapping Icon
         val iconCode = item.weather.firstOrNull()?.icon ?: ""
         holder.imgIcon.setImageResource(getWeatherIcon(iconCode))
     }
@@ -48,7 +47,7 @@ class HourlyAdapter(private val list: List<ForecastItem>) :
         return when (iconCode) {
             "01d", "01n" -> R.drawable.ic_sun
             "02d", "02n", "03d", "03n", "04d", "04n" -> R.drawable.ic_cloud
-            "09d", "09n", "10d", "10n" -> R.drawable.ic_rain
+            "09d", "09n", "10d", "10n", "11d", "11n" -> R.drawable.ic_rain
             else -> R.drawable.ic_cloud
         }
     }
