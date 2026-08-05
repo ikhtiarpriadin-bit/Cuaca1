@@ -1,6 +1,7 @@
 package com.example.cuaca1
 
 import android.Manifest
+import android.R.attr.icon
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
@@ -33,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     // Deklarasi Komponen UI Utama
     private lateinit var ivBackground: ImageView
     private lateinit var ivWeatherIcon: ImageView
+    private lateinit var ivTodayIcon: ImageView
+    private lateinit var ivTomorrowIcon: ImageView
     private lateinit var tvLocation: TextView
     private lateinit var tvTemperature: TextView
     private lateinit var tvCondition: TextView
@@ -80,6 +83,8 @@ class MainActivity : AppCompatActivity() {
         // Hubungkan ID XML Utama
         ivBackground = findViewById(R.id.ivBackground)
         ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
+        ivTodayIcon = findViewById(R.id.ivTodayIcon)
+        ivTomorrowIcon = findViewById(R.id.ivTomorrowIcon)
         tvLocation = findViewById(R.id.tvLocation)
         tvTemperature = findViewById(R.id.tvTemperature)
         tvCondition = findViewById(R.id.tvCondition)
@@ -166,14 +171,16 @@ class MainActivity : AppCompatActivity() {
 
                     val weather = data.weather.firstOrNull()
 
+// Mengambil kondisi cuaca dari API
                     val weatherMain = weather?.main ?: "Clear"
 
+// Mengambil deskripsi cuaca dari API
                     val weatherDescription = weather?.description ?: "-"
 
-                    // Log
-                    Log.d("CUACA", "Kota: ${data.name}")
-                    Log.d("CUACA", "Suhu: ${data.main.temp}")
-                    Log.d("CUACA", "Deskripsi: $weatherDescription")
+                    Log.d("CUACA", "Kota : ${data.name}")
+                    Log.d("CUACA", "Suhu : ${data.main.temp}")
+                    Log.d("CUACA", "Main : $weatherMain")
+                    Log.d("CUACA", "Description : $weatherDescription")
 
                     updateUI(data)
                     updateBackground(weatherMain)
@@ -229,30 +236,49 @@ class MainActivity : AppCompatActivity() {
     // GANTI BACKGROUND
     // =========================
     private fun updateBackground(weatherMain: String) {
+
         when (weatherMain) {
 
             "Clear" -> {
                 ivBackground.setImageResource(R.drawable.sun)
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
+                ivTodayIcon.setImageResource(R.drawable.ic_sun)
+                ivTomorrowIcon.setImageResource(R.drawable.ic_sun)
             }
 
             "Clouds" -> {
                 ivBackground.setImageResource(R.drawable.cloud)
                 ivWeatherIcon.setImageResource(R.drawable.ic_cloud)
+                ivTodayIcon.setImageResource(R.drawable.ic_cloud)
+                ivTomorrowIcon.setImageResource(R.drawable.ic_cloud)
             }
 
             "Rain" -> {
                 ivBackground.setImageResource(R.drawable.rain)
                 ivWeatherIcon.setImageResource(R.drawable.ic_rain)
+                ivTodayIcon.setImageResource(R.drawable.ic_rain)
+                ivTomorrowIcon.setImageResource(R.drawable.ic_rain)
             }
 
             else -> {
                 ivBackground.setImageResource(R.drawable.sun)
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
+                ivTodayIcon.setImageResource(R.drawable.ic_sun)
+                ivTomorrowIcon.setImageResource(R.drawable.ic_sun)
             }
-
         }
+
+        // Mengubah ikon pada card Hari Ini dan Besok
+        val icon = when (weatherMain) {
+            "Clear" -> R.drawable.ic_sun
+            "Clouds" -> R.drawable.ic_cloud
+            "Rain" -> R.drawable.ic_rain
+            else -> R.drawable.ic_sun
+        }
+
+        ivTodayIcon.setImageResource(icon)
+        ivTomorrowIcon.setImageResource(icon)
+    }
     }
 
-}
 

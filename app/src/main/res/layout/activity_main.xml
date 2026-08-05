@@ -140,73 +140,115 @@
                     </LinearLayout>
 
                     <!-- Hari Ini & Besok -->
+                    <!-- Hari Ini & Besok -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:orientation="horizontal">
 
-                        <!-- Hari Ini -->
+                        <!-- =================== HARI INI =================== -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
                             android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
                             android:background="#1AFFFFFF"
-                            android:orientation="vertical"
-                            android:padding="12dp">
+                            android:orientation="horizontal"
+                            android:padding="12dp"
+                            android:gravity="center_vertical">
 
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <!-- Text -->
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Hari ini"
-                                android:textColor="@android:color/white" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="21°/36°"
-                                android:textColor="@android:color/white"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Hari ini"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="16sp"/>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Cerah"
-                                android:textColor="#CCFFFFFF" />
+                                <TextView
+                                    android:id="@+id/tvTodayTemp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="21°/36°"
+                                    android:textColor="@android:color/white"
+                                    android:textStyle="bold"
+                                    android:textSize="18sp"/>
 
+                                <TextView
+                                    android:id="@+id/tvTodayStatus"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Cerah"
+                                    android:textColor="#CCFFFFFF"/>
+                            </LinearLayout>
+
+                            <!-- Icon -->
+                            <ImageView
+                                android:id="@+id/ivTodayIcon"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginStart="8dp"
+                                android:contentDescription="Icon Cuaca Hari Ini"
+                                android:src="@drawable/ic_sun"/>
                         </LinearLayout>
 
-                        <!-- Besok -->
+                        <!-- =================== BESOK =================== -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
                             android:layout_weight="1"
+                            android:layout_marginStart="8dp"
                             android:background="#1AFFFFFF"
-                            android:orientation="vertical"
-                            android:padding="12dp">
+                            android:orientation="horizontal"
+                            android:padding="12dp"
+                            android:gravity="center_vertical">
 
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <!-- Text -->
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Besok"
-                                android:textColor="@android:color/white" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="20°/38°"
-                                android:textColor="@android:color/white"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Besok"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="16sp"/>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Cerah"
-                                android:textColor="#CCFFFFFF" />
+                                <TextView
+                                    android:id="@+id/tvTomorrowTemp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="20°/38°"
+                                    android:textColor="@android:color/white"
+                                    android:textStyle="bold"
+                                    android:textSize="18sp"/>
+
+                                <TextView
+                                    android:id="@+id/tvTomorrowStatus"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Cerah"
+                                    android:textColor="#CCFFFFFF"/>
+                            </LinearLayout>
+
+                            <!-- Icon -->
+                            <ImageView
+                                android:id="@+id/ivTomorrowIcon"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginStart="8dp"
+                                android:contentDescription="Icon Cuaca Besok"
+                                android:src="@drawable/ic_sun"/>
                         </LinearLayout>
 
                     </LinearLayout>
