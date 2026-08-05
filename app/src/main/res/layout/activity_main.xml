@@ -40,18 +40,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="20dp"
         android:text="--°"
         android:textColor="@android:color/white"
-        android:textSize="96sp"
+        android:textSize="80sp"
         android:fontFamily="sans-serif-light"
         app:layout_constraintTop_toBottomOf="@id/tvLocation"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <ImageView
         android:id="@+id/ivWeatherIcon"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginStart="16dp"
         android:contentDescription="Weather Icon"
         android:src="@drawable/ic_sun"
@@ -86,13 +86,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- ================= Forecast Per Jam ================= -->
-
+    <!-- Forecast Per Jam Title -->
     <TextView
         android:id="@+id/tvHourlyTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:text="Perkiraan Hari Ini"
         android:textColor="@android:color/white"
@@ -101,6 +100,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvFeelsLike"
         app:layout_constraintStart_toStartOf="parent"/>
 
+    <!-- RecyclerView Per Jam -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvHourlyForecast"
         android:layout_width="0dp"
@@ -114,13 +114,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_hourly_forecast"/>
 
-    <!-- ScrollView -->
-    <ScrollView
+    <!-- ScrollView untuk Konten Bawah -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        android:layout_marginTop="24dp"
-        app:layout_constraintTop_toTopOf="@+id/tvFeelsLike"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/rvHourlyForecast"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -131,7 +131,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Card Informasi Cuaca -->
+            <!-- Card Informasi & Forecast 5 Hari -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -140,32 +140,14 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
 
-                <!-- ================= Forecast 5 Hari ================= -->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="Perkiraan 5 Hari"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold"
-                    android:textSize="18sp"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvDailyForecast"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:nestedScrollingEnabled="false"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_daily_forecast"/>
-
+                <!-- Pembungkus Tunggal di dalam CardView -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
 
+                    <!-- Header Section Detail -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -191,21 +173,20 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="12dp"
                         android:orientation="horizontal">
 
-                        <!-- =================== HARI INI =================== -->
+                        <!-- HARI INI -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="6dp"
                             android:background="#1AFFFFFF"
                             android:orientation="horizontal"
                             android:padding="12dp"
                             android:gravity="center_vertical">
 
-                            <!-- Text -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -217,7 +198,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="Hari ini"
                                     android:textColor="@android:color/white"
-                                    android:textSize="16sp"/>
+                                    android:textSize="14sp"/>
 
                                 <TextView
                                     android:id="@+id/tvTodayTemp"
@@ -226,38 +207,36 @@
                                     android:text="21°/36°"
                                     android:textColor="@android:color/white"
                                     android:textStyle="bold"
-                                    android:textSize="18sp"/>
+                                    android:textSize="16sp"/>
 
                                 <TextView
                                     android:id="@+id/tvTodayStatus"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Cerah"
-                                    android:textColor="#CCFFFFFF"/>
+                                    android:textColor="#CCFFFFFF"
+                                    android:textSize="12sp"/>
                             </LinearLayout>
 
-                            <!-- Icon -->
                             <ImageView
                                 android:id="@+id/ivTodayIcon"
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
-                                android:layout_marginStart="8dp"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
                                 android:contentDescription="Icon Cuaca Hari Ini"
                                 android:src="@drawable/ic_sun"/>
                         </LinearLayout>
 
-                        <!-- =================== BESOK =================== -->
+                        <!-- BESOK -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="6dp"
                             android:background="#1AFFFFFF"
                             android:orientation="horizontal"
                             android:padding="12dp"
                             android:gravity="center_vertical">
 
-                            <!-- Text -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -269,7 +248,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="Besok"
                                     android:textColor="@android:color/white"
-                                    android:textSize="16sp"/>
+                                    android:textSize="14sp"/>
 
                                 <TextView
                                     android:id="@+id/tvTomorrowTemp"
@@ -278,47 +257,67 @@
                                     android:text="20°/38°"
                                     android:textColor="@android:color/white"
                                     android:textStyle="bold"
-                                    android:textSize="18sp"/>
+                                    android:textSize="16sp"/>
 
                                 <TextView
                                     android:id="@+id/tvTomorrowStatus"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Cerah"
-                                    android:textColor="#CCFFFFFF"/>
+                                    android:textColor="#CCFFFFFF"
+                                    android:textSize="12sp"/>
                             </LinearLayout>
 
-                            <!-- Icon -->
                             <ImageView
                                 android:id="@+id/ivTomorrowIcon"
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
-                                android:layout_marginStart="8dp"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
                                 android:contentDescription="Icon Cuaca Besok"
                                 android:src="@drawable/ic_sun"/>
                         </LinearLayout>
 
                     </LinearLayout>
 
+                    <!-- Title 5 Hari -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:text="Perkiraan 5 Hari"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+
+                    <!-- RecyclerView 5 Hari -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvDailyForecast"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:nestedScrollingEnabled="false"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_daily_forecast"/>
+
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
+            <!-- Grid Details (Humidity, Wind, Pressure, Visibility) -->
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
-                android:rowCount="2"
-                android:layout_marginTop="16dp">
+                android:rowCount="2">
 
                 <!-- Humidity -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
+                    android:layout_margin="4dp"
                     app:cardCornerRadius="18dp"
-                    app:cardBackgroundColor="#26FFFFFF">
+                    app:cardBackgroundColor="#26FFFFFF"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -329,15 +328,15 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Humidity"
+                            android:text="💧 Humidity"
                             android:textColor="#CCFFFFFF"/>
 
                         <TextView
+                            android:id="@+id/tvHumidity"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:id="@+id/tvHumidity"
                             android:text="75%"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textStyle="bold"
                             android:textColor="@android:color/white"/>
 
@@ -346,14 +345,14 @@
                 </androidx.cardview.widget.CardView>
 
                 <!-- Wind -->
-
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
+                    android:layout_margin="4dp"
                     app:cardCornerRadius="18dp"
-                    app:cardBackgroundColor="#26FFFFFF">
+                    app:cardBackgroundColor="#26FFFFFF"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -368,11 +367,11 @@
                             android:textColor="#CCFFFFFF"/>
 
                         <TextView
+                            android:id="@+id/tvWind"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:id="@+id/tvWind"
                             android:text="10 km/h"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textStyle="bold"
                             android:textColor="@android:color/white"/>
 
@@ -381,14 +380,14 @@
                 </androidx.cardview.widget.CardView>
 
                 <!-- Pressure -->
-
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
+                    android:layout_margin="4dp"
                     app:cardCornerRadius="18dp"
-                    app:cardBackgroundColor="#26FFFFFF">
+                    app:cardBackgroundColor="#26FFFFFF"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -403,11 +402,11 @@
                             android:textColor="#CCFFFFFF"/>
 
                         <TextView
+                            android:id="@+id/tvPressure"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:id="@+id/tvPressure"
                             android:text="1012 hPa"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textStyle="bold"
                             android:textColor="@android:color/white"/>
 
@@ -416,14 +415,14 @@
                 </androidx.cardview.widget.CardView>
 
                 <!-- Visibility -->
-
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
+                    android:layout_margin="4dp"
                     app:cardCornerRadius="18dp"
-                    app:cardBackgroundColor="#26FFFFFF">
+                    app:cardBackgroundColor="#26FFFFFF"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -438,11 +437,11 @@
                             android:textColor="#CCFFFFFF"/>
 
                         <TextView
+                            android:id="@+id/tvVisibility"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:id="@+id/tvVisibility"
                             android:text="10 km"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textStyle="bold"
                             android:textColor="@android:color/white"/>
 
@@ -454,6 +453,6 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

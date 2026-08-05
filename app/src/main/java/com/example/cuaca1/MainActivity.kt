@@ -1,7 +1,6 @@
 package com.example.cuaca1
 
 import android.Manifest
-import android.R.attr.icon
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
@@ -16,7 +15,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.cuaca1.adapter.DailyAdapter
+import com.example.cuaca1.adapter.HourlyAdapter
 import com.example.cuaca1.api.RetrofitClient
+import com.example.cuaca1.model.ForecastResponse
 import com.example.cuaca1.model.WeatherResponse
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -28,10 +32,9 @@ class MainActivity : AppCompatActivity() {
 
     private val API_KEY = "277e22a7fbc5477aedc466d91c974316"
 
-    // FusedLocationProviderClient untuk mengambil lokasi perangkat
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    // Deklarasi Komponen UI Utama
+    // UI Utama
     private lateinit var ivBackground: ImageView
     private lateinit var ivWeatherIcon: ImageView
     private lateinit var ivTodayIcon: ImageView
@@ -41,26 +44,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvCondition: TextView
     private lateinit var tvFeelsLike: TextView
 
-    // Deklarasi Komponen UI 5 Fitur Baru
+    // Detail Cuaca
     private lateinit var tvHumidity: TextView
     private lateinit var tvWind: TextView
-    private lateinit var tvUV: TextView
     private lateinit var tvPressure: TextView
     private lateinit var tvVisibility: TextView
 
-    // Register callback untuk meminta permission lokasi di runtime
+    // RecyclerView Forecast
+    private lateinit var rvHourlyForecast: RecyclerView
+    private lateinit var rvDailyForecast: RecyclerView
+
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) ||
                     permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                // Izin disetujui, ambil lokasi GPS
                 dapatkanLokasiPerangkat()
             }
             else -> {
                 Toast.makeText(this, "Izin lokasi ditolak! Menggunakan lokasi default.", Toast.LENGTH_SHORT).show()
-                // Jika izin ditolak, jalankan dengan koordinat default (Banjarmasin)
                 ambilDataCuaca(-3.3162, 114.5938)
             }
         }
@@ -71,7 +74,6 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        // Inisialisasi Location Services
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -80,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // Hubungkan ID XML Utama
+        // Bind View ID Utama
         ivBackground = findViewById(R.id.ivBackground)
         ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
         ivTodayIcon = findViewById(R.id.ivTodayIcon)
@@ -90,19 +92,22 @@ class MainActivity : AppCompatActivity() {
         tvCondition = findViewById(R.id.tvCondition)
         tvFeelsLike = findViewById(R.id.tvFeelsLike)
 
-        // Hubungkan ID XML 5 Fitur Baru
+        // Bind View ID Detail
         tvHumidity = findViewById(R.id.tvHumidity)
         tvWind = findViewById(R.id.tvWind)
         tvPressure = findViewById(R.id.tvPressure)
         tvVisibility = findViewById(R.id.tvVisibility)
 
-        // Minta Izin Lokasi dan Ambil Data
+        // Bind & Set Layout Manager untuk RecyclerView Forecast
+        rvHourlyForecast = findViewById(R.id.rvHourlyForecast)
+        rvDailyForecast = findViewById(R.id.rvDailyForecast)
+
+        rvHourlyForecast.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        rvDailyForecast.layoutManager = LinearLayoutManager(this)
+
         cekAtauMintaIzinLokasi()
     }
 
-    /**
-     * Mengecek apakah izin lokasi sudah diberikan, jika belum akan meminta izin
-     */
     private fun cekAtauMintaIzinLokasi() {
         val fineLocationGranted = ContextCompat.checkSelfPermission(
             this, Manifest.permission.ACCESS_FINE_LOCATION
@@ -113,10 +118,8 @@ class MainActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
 
         if (fineLocationGranted || coarseLocationGranted) {
-            // Sudah dapat izin
             dapatkanLokasiPerangkat()
         } else {
-            // Belum dapat izin, munculkan dialog pop-up izin
             locationPermissionRequest.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -126,19 +129,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Membaca titik koordinat GPS HP pengguna
-     */
     @SuppressLint("MissingPermission")
     private fun dapatkanLokasiPerangkat() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 if (location != null) {
-                    // dapatkan lokasi nyata pengguna
                     Log.d("GPS", "Lat: ${location.latitude}, Lon: ${location.longitude}")
                     ambilDataCuaca(location.latitude, location.longitude)
                 } else {
-                    // Jika lokasi lastLocation null (misal GPS baru dinyalakan di emulator)
                     Toast.makeText(this, "Tidak dapat mendeteksi GPS, memuat lokasi default", Toast.LENGTH_SHORT).show()
                     ambilDataCuaca(-3.3162, 114.5938)
                 }
@@ -149,57 +147,60 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    /**
-     * Memanggil API Cuaca berdasarkan koordinat lat dan lon yang dinamis
-     */
     private fun ambilDataCuaca(latitude: Double, longitude: Double) {
-
+        // 1. Panggil Current Weather API
         RetrofitClient.api.getWeather(
             lat = latitude,
             lon = longitude,
             apiKey = API_KEY
         ).enqueue(object : Callback<WeatherResponse> {
-
-            override fun onResponse(
-                call: Call<WeatherResponse>,
-                response: Response<WeatherResponse>
-            ) {
-
+            override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
                 if (response.isSuccessful && response.body() != null) {
-
                     val data = response.body()!!
-
                     val weather = data.weather.firstOrNull()
-
-// Mengambil kondisi cuaca dari API
                     val weatherMain = weather?.main ?: "Clear"
-
-// Mengambil deskripsi cuaca dari API
-                    val weatherDescription = weather?.description ?: "-"
-
-                    Log.d("CUACA", "Kota : ${data.name}")
-                    Log.d("CUACA", "Suhu : ${data.main.temp}")
-                    Log.d("CUACA", "Main : $weatherMain")
-                    Log.d("CUACA", "Description : $weatherDescription")
 
                     updateUI(data)
                     updateBackground(weatherMain)
-
                 } else {
-
-                    Log.e("CUACA", "Error Response: ${response.code()}")
-
+                    Log.e("CUACA", "Error Response Current: ${response.code()}")
                 }
-
             }
 
             override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
-                Log.e("CUACA", "Failure: ${t.message}")
+                Log.e("CUACA", "Failure Current: ${t.message}")
             }
-
         })
 
+        // 2. Panggil Forecast API (Per Jam & 5 Hari)
+        RetrofitClient.api.getForecast(
+            lat = latitude,
+            lon = longitude,
+            apiKey = API_KEY
+        ).enqueue(object : Callback<ForecastResponse> {
+            override fun onResponse(call: Call<ForecastResponse>, response: Response<ForecastResponse>) {
+                if (response.isSuccessful && response.body() != null) {
+                    val fullList = response.body()!!.list
+
+                    // Hourly: Ambil 8 interval 3-jam pertama (= 24 jam)
+                    val hourlyList = fullList.take(8)
+                    rvHourlyForecast.adapter = HourlyAdapter(hourlyList)
+
+                    // Daily: Ambil 1 item setiap selang 8 data (~1 hari sekali)
+                    val dailyList = fullList.filterIndexed { index, _ -> index % 8 == 0 }
+                    rvDailyForecast.adapter = DailyAdapter(dailyList)
+
+                } else {
+                    Log.e("CUACA", "Error Response Forecast: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ForecastResponse>, t: Throwable) {
+                Log.e("CUACA", "Failure Forecast: ${t.message}")
+            }
+        })
     }
+
     private fun translateWeather(weather: String): String {
         return when (weather) {
             "Clear" -> "Cerah"
@@ -211,64 +212,39 @@ class MainActivity : AppCompatActivity() {
             else -> weather
         }
     }
+
     private fun updateUI(data: WeatherResponse) {
-
         val weather = data.weather.firstOrNull()
-
         tvLocation.text = data.name
-
         tvTemperature.text = "${data.main.temp.toInt()}°C"
-
         tvCondition.text = translateWeather(weather?.main ?: "")
-
         tvFeelsLike.text = "Terasa seperti ${data.main.feelsLike.toInt()}°C"
-
         tvHumidity.text = "${data.main.humidity}%"
-
         tvWind.text = "${data.wind.speed} m/s"
-
         tvPressure.text = "${data.main.pressure} hPa"
-
         tvVisibility.text = "${data.visibility / 1000} km"
-
     }
-    // =========================
-    // GANTI BACKGROUND
-    // =========================
+
     private fun updateBackground(weatherMain: String) {
-
         when (weatherMain) {
-
             "Clear" -> {
                 ivBackground.setImageResource(R.drawable.sun)
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
-                ivTodayIcon.setImageResource(R.drawable.ic_sun)
-                ivTomorrowIcon.setImageResource(R.drawable.ic_sun)
             }
-
             "Clouds" -> {
                 ivBackground.setImageResource(R.drawable.cloud)
                 ivWeatherIcon.setImageResource(R.drawable.ic_cloud)
-                ivTodayIcon.setImageResource(R.drawable.ic_cloud)
-                ivTomorrowIcon.setImageResource(R.drawable.ic_cloud)
             }
-
             "Rain" -> {
                 ivBackground.setImageResource(R.drawable.rain)
                 ivWeatherIcon.setImageResource(R.drawable.ic_rain)
-                ivTodayIcon.setImageResource(R.drawable.ic_rain)
-                ivTomorrowIcon.setImageResource(R.drawable.ic_rain)
             }
-
             else -> {
                 ivBackground.setImageResource(R.drawable.sun)
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
-                ivTodayIcon.setImageResource(R.drawable.ic_sun)
-                ivTomorrowIcon.setImageResource(R.drawable.ic_sun)
             }
         }
 
-        // Mengubah ikon pada card Hari Ini dan Besok
         val icon = when (weatherMain) {
             "Clear" -> R.drawable.ic_sun
             "Clouds" -> R.drawable.ic_cloud
@@ -280,5 +256,3 @@ class MainActivity : AppCompatActivity() {
         ivTomorrowIcon.setImageResource(icon)
     }
 }
-
-
