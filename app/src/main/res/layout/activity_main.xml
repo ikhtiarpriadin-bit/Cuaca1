@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <!-- 1. Gambar Background (Fixed) -->
+        <!-- 1. Gambar Background -->
         <ImageView
             android:id="@+id/ivBackground"
             android:layout_width="match_parent"
@@ -25,7 +25,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- 2. Overlay Gelap (Fixed) -->
+        <!-- 2. Overlay Gelap Halus -->
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -33,8 +33,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <!-- 3. Lokasi (STICKY HEADER - Tetap di Atas Saat Di-scroll) -->
-        <!-- Header -->
+        <!-- 3. Header Lokasi & Search -->
         <TextView
             android:id="@+id/tvLocation"
             android:layout_width="wrap_content"
@@ -78,7 +77,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- 4. ScrollView Utama (Membungkus Suhu sampai Detail Bawah) -->
+        <!-- 4. ScrollView Utama -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -95,7 +94,7 @@
                 android:orientation="vertical"
                 android:paddingTop="16dp">
 
-                <!-- Suhu & Icon Utama (Ikut Di-scroll) -->
+                <!-- Suhu Utama -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -121,7 +120,7 @@
                         android:src="@drawable/ic_sun"/>
                 </LinearLayout>
 
-                <!-- Kondisi & Feels Like (Ikut Di-scroll) -->
+                <!-- Kondisi Cuaca -->
                 <TextView
                     android:id="@+id/tvCondition"
                     android:layout_width="wrap_content"
@@ -142,14 +141,14 @@
                     android:textColor="#E6FFFFFF"
                     android:textSize="14sp"/>
 
-                <!-- Judul Section Per Jam -->
+                <!-- Judul Per Jam -->
                 <TextView
                     android:id="@+id/tvHourlyTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:paddingHorizontal="24dp"
-                    android:text="Perkiraan Hari Ini"
+                    android:text="Perkiraan Per Jam"
                     android:textColor="@android:color/white"
                     android:textStyle="bold"
                     android:textSize="18sp"/>
@@ -168,20 +167,20 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:listitem="@layout/item_hourly_forecast"/>
 
-                <!-- Container Bagian Bawah (Card 5 Hari & Grid Detail) -->
+                <!-- Container Bagian Bawah -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Card Forecast 5 Hari -->
+                    <!-- Card Forecast 5 Hari (Latar Transparan Halus) -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:cardBackgroundColor="#40000000"
-                        app:cardCornerRadius="24dp"
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="#26FFFFFF"
+                        app:cardCornerRadius="20dp"
                         app:cardElevation="0dp">
 
                         <LinearLayout
@@ -196,7 +195,7 @@
                                 android:text="Perkiraan Harian"
                                 android:textColor="@android:color/white"
                                 android:textStyle="bold"
-                                android:textSize="18sp"/>
+                                android:textSize="16sp"/>
 
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/rvDailyForecast"
@@ -211,151 +210,159 @@
 
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Grid Detail Cuaca -->
+                    <!-- GRID DETAIL CUACA 2x2 Clean -->
                     <GridLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:columnCount="2"
                         android:rowCount="2">
 
-                        <!-- Humidity -->
+                        <!-- Kelembapan -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="110dp"
                             android:layout_columnWeight="1"
-                            android:layout_margin="4dp"
-                            app:cardCornerRadius="18dp"
-                            app:cardBackgroundColor="#40000000"
+                            android:layout_margin="5dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardBackgroundColor="#26FFFFFF"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:padding="16dp"
-                                android:orientation="vertical">
+                                android:orientation="vertical"
+                                android:gravity="center_vertical">
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="💧 Humidity"
-                                    android:textColor="#CCFFFFFF"/>
+                                    android:text="Kelembapan"
+                                    android:textSize="13sp"
+                                    android:textColor="#B3FFFFFF"/>
 
                                 <TextView
                                     android:id="@+id/tvHumidity"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
                                     android:text="75%"
                                     android:textSize="22sp"
                                     android:textStyle="bold"
                                     android:textColor="@android:color/white"/>
 
                             </LinearLayout>
-
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Wind -->
+                        <!-- Kecepatan Angin -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="110dp"
                             android:layout_columnWeight="1"
-                            android:layout_margin="4dp"
-                            app:cardCornerRadius="18dp"
-                            app:cardBackgroundColor="#40000000"
+                            android:layout_margin="5dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardBackgroundColor="#26FFFFFF"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:padding="16dp"
-                                android:orientation="vertical">
+                                android:orientation="vertical"
+                                android:gravity="center_vertical">
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="🌬 Wind"
-                                    android:textColor="#CCFFFFFF"/>
+                                    android:text="Kecepatan Angin"
+                                    android:textSize="13sp"
+                                    android:textColor="#B3FFFFFF"/>
 
                                 <TextView
                                     android:id="@+id/tvWind"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="10 km/h"
+                                    android:layout_marginTop="6dp"
+                                    android:text="10 m/s"
                                     android:textSize="22sp"
                                     android:textStyle="bold"
                                     android:textColor="@android:color/white"/>
 
                             </LinearLayout>
-
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Pressure -->
+                        <!-- Tekanan Udara -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="110dp"
                             android:layout_columnWeight="1"
-                            android:layout_margin="4dp"
-                            app:cardCornerRadius="18dp"
-                            app:cardBackgroundColor="#40000000"
+                            android:layout_margin="5dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardBackgroundColor="#26FFFFFF"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:padding="16dp"
-                                android:orientation="vertical">
+                                android:orientation="vertical"
+                                android:gravity="center_vertical">
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="🌡 Pressure"
-                                    android:textColor="#CCFFFFFF"/>
+                                    android:text="Tekanan Udara"
+                                    android:textSize="13sp"
+                                    android:textColor="#B3FFFFFF"/>
 
                                 <TextView
                                     android:id="@+id/tvPressure"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
                                     android:text="1012 hPa"
                                     android:textSize="22sp"
                                     android:textStyle="bold"
                                     android:textColor="@android:color/white"/>
 
                             </LinearLayout>
-
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Visibility -->
+                        <!-- Jarak Pandang -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="110dp"
                             android:layout_columnWeight="1"
-                            android:layout_margin="4dp"
-                            app:cardCornerRadius="18dp"
-                            app:cardBackgroundColor="#40000000"
+                            android:layout_margin="5dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardBackgroundColor="#26FFFFFF"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:padding="16dp"
-                                android:orientation="vertical">
+                                android:orientation="vertical"
+                                android:gravity="center_vertical">
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="👁 Visibility"
-                                    android:textColor="#CCFFFFFF"/>
+                                    android:text="Jarak Pandang"
+                                    android:textSize="13sp"
+                                    android:textColor="#B3FFFFFF"/>
 
                                 <TextView
                                     android:id="@+id/tvVisibility"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
                                     android:text="10 km"
                                     android:textSize="22sp"
                                     android:textStyle="bold"
                                     android:textColor="@android:color/white"/>
 
                             </LinearLayout>
-
                         </androidx.cardview.widget.CardView>
 
                     </GridLayout>
