@@ -1,7 +1,6 @@
 package com.example.cuaca1
-import android.view.inputmethod.InputMethodManager
+
 import android.Manifest
-import androidx.appcompat.widget.SearchView
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -9,12 +8,14 @@ import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -80,61 +81,19 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        // 1. Set Status Bar Transparan & Ikon Putih
+        // Status bar transparan
         setStatusBarTransparent()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Adjust padding agar tidak tertutup gesture bar bawah
+        // Padding gesture bar bawah
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // Hanya beri padding bottom agar status bar atas menyatu penuh dengan background
             v.setPadding(0, 0, 0, systemBars.bottom)
             insets
         }
-        searchView = findViewById(R.id.searchView)
-        searchView.visibility = View.GONE
 
-        searchView.setOnCloseListener {
-
-            closeSearch()
-
-            true
-        }
-
-        ivSearch = findViewById(R.id.btnSearch)
-
-        ivSearch.setOnClickListener {
-            openSearch()
-        }
-        searchView.clearFocus()
-        searchView.setOnQueryTextListener(object :
-            SearchView.OnQueryTextListener {
-
-            override fun onQueryTextSubmit(query: String?): Boolean {
-
-                if (!query.isNullOrBlank()) {
-                    cariKota(query)
-                }
-
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return false
-            }
-        })
-
-
-
-        // Bind SwipeRefreshLayout
-        swipeRefresh = findViewById(R.id.swipeRefresh)
-        swipeRefresh.setOnRefreshListener {
-            Toast.makeText(this, "Memperbarui data cuaca...", Toast.LENGTH_SHORT).show()
-            dapatkanLokasiPerangkat()
-        }
-
-        // Bind View ID Utama
+        // Bind View Utama & Detail
         ivBackground = findViewById(R.id.ivBackground)
         ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
         tvLocation = findViewById(R.id.tvLocation)
@@ -142,148 +101,57 @@ class MainActivity : AppCompatActivity() {
         tvCondition = findViewById(R.id.tvCondition)
         tvFeelsLike = findViewById(R.id.tvFeelsLike)
 
-        // Bind View ID Detail
         tvHumidity = findViewById(R.id.tvHumidity)
         tvWind = findViewById(R.id.tvWind)
         tvPressure = findViewById(R.id.tvPressure)
         tvVisibility = findViewById(R.id.tvVisibility)
 
-        // Bind & Set Layout Manager untuk RecyclerView Forecast
+        // Bind RecyclerView
         rvHourlyForecast = findViewById(R.id.rvHourlyForecast)
         rvDailyForecast = findViewById(R.id.rvDailyForecast)
-
         rvHourlyForecast.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvDailyForecast.layoutManager = LinearLayoutManager(this)
 
+        // Setup Search
+        ivSearch = findViewById(R.id.btnSearch)
+        searchView = findViewById(R.id.searchView)
+        searchView.queryHint = "Cari kota..."
+        searchView.visibility = View.GONE
+
+        ivSearch.setOnClickListener { openSearch() }
+
+        searchView.setOnCloseListener {
+            closeSearch()
+            true
+        }
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (!query.isNullOrBlank()) {
+                    cariKota(query.trim())
+                }
+                searchView.clearFocus()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean = false
+        })
+
+        // SwipeRefresh (Menggunakan spinner normal bawaan Android)
+        swipeRefresh = findViewById(R.id.swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            Toast.makeText(this, "Memperbarui data cuaca...", Toast.LENGTH_SHORT).show()
+            dapatkanLokasiPerangkat()
+        }
+
         cekAtauMintaIzinLokasi()
-    }
-    private fun cariKota(city: String) {
-
-        swipeRefresh.isRefreshing = true
-
-        RetrofitClient.api.getWeatherByCity(
-            city = city,
-            apiKey = API_KEY
-        ).enqueue(object : Callback<WeatherResponse> {
-
-            override fun onResponse(
-                call: Call<WeatherResponse>,
-                response: Response<WeatherResponse>
-            ) {
-
-                swipeRefresh.isRefreshing = false
-
-                if (response.isSuccessful && response.body() != null) {
-
-                    val data = response.body()!!
-
-                    updateUI(data)
-
-                    val weather = data.weather.firstOrNull()
-
-                    updateBackground(weather?.icon ?: "01d")
-
-                    ambilForecast(data.coord.lat, data.coord.lon)
-                    closeSearch()
-                } else {
-
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Kota tidak ditemukan",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    searchView.requestFocus()
-
-                }
-
-            }
-
-            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
-
-                swipeRefresh.isRefreshing = false
-
-                Toast.makeText(
-                    this@MainActivity,
-                    "Gagal mencari kota",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-            }
-
-        })
-
-    }
-    private fun ambilForecast(
-        latitude: Double,
-        longitude: Double
-    ) {
-
-        RetrofitClient.api.getForecast(
-            lat = latitude,
-            lon = longitude,
-            apiKey = API_KEY
-        ).enqueue(object : Callback<ForecastResponse> {
-
-            override fun onResponse(
-                call: Call<ForecastResponse>,
-                response: Response<ForecastResponse>
-            ) {
-
-                if (response.isSuccessful && response.body() != null) {
-
-                    val fullList = response.body()!!.list
-
-                    rvHourlyForecast.adapter =
-                        HourlyAdapter(fullList.take(8))
-
-                    val grouped = fullList.groupBy {
-                        it.dtTxt.substring(0, 10)
-                    }
-
-                    val dailyList = mutableListOf<ForecastItem>()
-
-                    grouped.forEach { (_, items) ->
-
-                        val min = items.minOf { it.main.tempMin }
-                        val max = items.maxOf { it.main.tempMax }
-
-                        val sample =
-                            items.find { it.dtTxt.contains("12:00") }
-                                ?: items.first()
-
-                        dailyList.add(
-                            sample.copy(
-                                main = sample.main.copy(
-                                    tempMin = min,
-                                    tempMax = max
-                                )
-                            )
-                        )
-                    }
-
-                    rvDailyForecast.adapter =
-                        DailyAdapter(dailyList)
-
-                }
-
-            }
-
-            override fun onFailure(
-                call: Call<ForecastResponse>,
-                t: Throwable
-            ) {
-            }
-
-        })
-
     }
 
     private fun setStatusBarTransparent() {
         window.apply {
             statusBarColor = Color.TRANSPARENT
             WindowCompat.getInsetsController(this, decorView).apply {
-                isAppearanceLightStatusBars = false // False = Ikon (Jam, Baterai, Wi-Fi) Putih
+                isAppearanceLightStatusBars = false
             }
         }
     }
@@ -328,7 +196,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun ambilDataCuaca(latitude: Double, longitude: Double) {
-        // 1. Panggil Current Weather API
+        swipeRefresh.isRefreshing = true
+
         RetrofitClient.api.getWeather(
             lat = latitude,
             lon = longitude,
@@ -336,16 +205,11 @@ class MainActivity : AppCompatActivity() {
         ).enqueue(object : Callback<WeatherResponse> {
             override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
                 swipeRefresh.isRefreshing = false
-
                 if (response.isSuccessful && response.body() != null) {
                     val data = response.body()!!
-                    val weather = data.weather.firstOrNull()
                     updateUI(data)
-
-                    val iconCode = weather?.icon ?: "01d"
-                    updateBackground(iconCode)
-
-                    Toast.makeText(this@MainActivity, "Data cuaca berhasil diperbarui", Toast.LENGTH_SHORT).show()
+                    updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
+                    ambilForecast(data.coord.lat, data.coord.lon)
                 } else {
                     Log.e("CUACA", "Error Response Current: ${response.code()}")
                 }
@@ -357,8 +221,38 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Gagal memperbarui data cuaca", Toast.LENGTH_SHORT).show()
             }
         })
+    }
 
-        // 2. Panggil Forecast API (Per Jam & 5 Hari)
+    private fun cariKota(city: String) {
+        swipeRefresh.isRefreshing = true
+
+        RetrofitClient.api.getWeatherByCity(
+            city = city,
+            apiKey = API_KEY
+        ).enqueue(object : Callback<WeatherResponse> {
+            override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
+                swipeRefresh.isRefreshing = false
+                if (response.isSuccessful && response.body() != null) {
+                    val data = response.body()!!
+                    updateUI(data)
+                    updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
+                    ambilForecast(data.coord.lat, data.coord.lon)
+                    closeSearch()
+                } else {
+                    Toast.makeText(this@MainActivity, "Kota \"$city\" tidak ditemukan", Toast.LENGTH_SHORT).show()
+                    searchView.isIconified = false
+                    searchView.requestFocus()
+                }
+            }
+
+            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+                swipeRefresh.isRefreshing = false
+                Toast.makeText(this@MainActivity, "Gagal mencari kota", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun ambilForecast(latitude: Double, longitude: Double) {
         RetrofitClient.api.getForecast(
             lat = latitude,
             lon = longitude,
@@ -368,8 +262,7 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body() != null) {
                     val fullList = response.body()!!.list
 
-                    val hourlyList = fullList.take(8)
-                    rvHourlyForecast.adapter = HourlyAdapter(hourlyList)
+                    rvHourlyForecast.adapter = HourlyAdapter(fullList.take(8))
 
                     val groupedByDate = fullList.groupBy { it.dtTxt.substring(0, 10) }
                     val dailyList = mutableListOf<ForecastItem>()
@@ -378,22 +271,21 @@ class MainActivity : AppCompatActivity() {
                         val realMinTemp = itemsInDay.minOfOrNull { it.main.tempMin } ?: 0.0
                         val realMaxTemp = itemsInDay.maxOfOrNull { it.main.tempMax } ?: 0.0
 
-                        val sampleItem =
-                            itemsInDay.find { it.dtTxt.contains("09:00:00") }
-                                ?: itemsInDay.find { it.dtTxt.contains("12:00:00") }
-                                ?: itemsInDay.find { it.dtTxt.contains("15:00:00") }
-                                ?: itemsInDay.first()
+                        val sampleItem = itemsInDay.find { it.dtTxt.contains("09:00:00") }
+                            ?: itemsInDay.find { it.dtTxt.contains("12:00:00") }
+                            ?: itemsInDay.find { it.dtTxt.contains("15:00:00") }
+                            ?: itemsInDay.firstOrNull()
 
-                        val updatedMain = sampleItem.main.copy(
-                            tempMin = realMinTemp,
-                            tempMax = realMaxTemp
-                        )
-
-                        dailyList.add(sampleItem.copy(main = updatedMain))
+                        sampleItem?.let { item ->
+                            val updatedMain = item.main.copy(
+                                tempMin = realMinTemp,
+                                tempMax = realMaxTemp
+                            )
+                            dailyList.add(item.copy(main = updatedMain))
+                        }
                     }
 
                     rvDailyForecast.adapter = DailyAdapter(dailyList)
-
                 } else {
                     Log.e("CUACA", "Error Response Forecast: ${response.code()}")
                 }
@@ -412,7 +304,7 @@ class MainActivity : AppCompatActivity() {
             "Rain" -> "Hujan"
             "Thunderstorm" -> "Badai Petir"
             "Drizzle" -> "Gerimis"
-            "Mist" -> "Berkabut"
+            "Mist", "Fog" -> "Berkabut"
             else -> weather
         }
     }
@@ -457,6 +349,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun openSearch() {
         if (searchView.visibility == View.VISIBLE) return
 
@@ -465,23 +358,19 @@ class MainActivity : AppCompatActivity() {
         searchView.visibility = View.VISIBLE
         searchView.alpha = 0f
         searchView.translationY = -20f
-        searchView.setQuery("", false)
         searchView.isIconified = false
         searchView.requestFocus()
-        searchView.requestFocusFromTouch()
 
         searchView.post {
             val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT)
         }
 
-
         searchView.animate()
             .alpha(1f)
             .translationY(0f)
             .setDuration(220)
             .start()
-
     }
 
     private fun closeSearch() {
@@ -501,26 +390,21 @@ class MainActivity : AppCompatActivity() {
             .translationY(-10f)
             .setDuration(220)
             .withEndAction {
-
                 searchView.setQuery("", false)
                 searchView.visibility = View.GONE
-
                 searchView.alpha = 1f
                 searchView.translationY = 0f
-
                 ivSearch.visibility = View.VISIBLE
             }
             .start()
     }
+
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
-
         if (searchView.visibility == View.VISIBLE) {
-
             closeSearch()
             return
         }
-
         super.onBackPressed()
     }
 }
