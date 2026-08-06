@@ -1,5 +1,5 @@
 package com.example.cuaca1
-
+import android.view.inputmethod.InputMethodManager
 import android.Manifest
 import androidx.appcompat.widget.SearchView
 import android.annotation.SuppressLint
@@ -93,21 +93,19 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         searchView = findViewById(R.id.searchView)
+        searchView.visibility = View.GONE
 
         searchView.setOnCloseListener {
 
-            searchView.visibility = View.GONE
-            true
+            closeSearch()
 
+            true
         }
 
         ivSearch = findViewById(R.id.btnSearch)
-        ivSearch.setOnClickListener {
-            ivSearch.visibility = View.GONE
 
-            searchView.visibility = View.VISIBLE
-            searchView.isIconified = false
-            searchView.requestFocus()
+        ivSearch.setOnClickListener {
+            openSearch()
         }
         searchView.clearFocus()
         searchView.setOnQueryTextListener(object :
@@ -115,11 +113,10 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
 
-                if (!query.isNullOrEmpty()) {
+                if (!query.isNullOrBlank()) {
                     cariKota(query)
                 }
 
-                searchView.clearFocus()
                 return true
             }
 
@@ -127,6 +124,8 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
+
+
 
         // Bind SwipeRefreshLayout
         swipeRefresh = findViewById(R.id.swipeRefresh)
@@ -185,7 +184,7 @@ class MainActivity : AppCompatActivity() {
                     updateBackground(weather?.icon ?: "01d")
 
                     ambilForecast(data.coord.lat, data.coord.lon)
-
+                    closeSearch()
                 } else {
 
                     Toast.makeText(
@@ -193,6 +192,8 @@ class MainActivity : AppCompatActivity() {
                         "Kota tidak ditemukan",
                         Toast.LENGTH_SHORT
                     ).show()
+
+                    searchView.requestFocus()
 
                 }
 
@@ -456,16 +457,67 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    private fun openSearch() {
+        if (searchView.visibility == View.VISIBLE) return
+
+        ivSearch.visibility = View.GONE
+
+        searchView.visibility = View.VISIBLE
+        searchView.alpha = 0f
+        searchView.translationY = -20f
+        searchView.setQuery("", false)
+        searchView.isIconified = false
+        searchView.requestFocus()
+        searchView.requestFocusFromTouch()
+
+        searchView.post {
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT)
+        }
+
+
+        searchView.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(220)
+            .start()
+
+    }
+
+    private fun closeSearch() {
+        if (searchView.visibility == View.GONE) return
+
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(
+            currentFocus?.windowToken ?: searchView.windowToken,
+            0
+        )
+
+        searchView.clearFocus()
+        searchView.isIconified = true
+
+        searchView.animate()
+            .alpha(0f)
+            .translationY(-10f)
+            .setDuration(220)
+            .withEndAction {
+
+                searchView.setQuery("", false)
+                searchView.visibility = View.GONE
+
+                searchView.alpha = 1f
+                searchView.translationY = 0f
+
+                ivSearch.visibility = View.VISIBLE
+            }
+            .start()
+    }
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
 
         if (searchView.visibility == View.VISIBLE) {
 
-            searchView.setQuery("", false)
-            searchView.clearFocus()
-            searchView.visibility = View.GONE
-
-            ivSearch.visibility = View.VISIBLE
+            closeSearch()
             return
         }
 
