@@ -3,6 +3,7 @@ package com.example.cuaca1
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -74,17 +76,23 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        // 1. Set Status Bar Transparan & Ikon Putih
+        setStatusBarTransparent()
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        // Adjust padding agar tidak tertutup gesture bar bawah
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            // Hanya beri padding bottom agar status bar atas menyatu penuh dengan background
+            v.setPadding(0, 0, 0, systemBars.bottom)
             insets
         }
 
         // Bind SwipeRefreshLayout
         swipeRefresh = findViewById(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
+            Toast.makeText(this, "Memperbarui data cuaca...", Toast.LENGTH_SHORT).show()
             dapatkanLokasiPerangkat()
         }
 
@@ -110,6 +118,15 @@ class MainActivity : AppCompatActivity() {
         rvDailyForecast.layoutManager = LinearLayoutManager(this)
 
         cekAtauMintaIzinLokasi()
+    }
+
+    private fun setStatusBarTransparent() {
+        window.apply {
+            statusBarColor = Color.TRANSPARENT
+            WindowCompat.getInsetsController(this, decorView).apply {
+                isAppearanceLightStatusBars = false // False = Ikon (Jam, Baterai, Wi-Fi) Putih
+            }
+        }
     }
 
     private fun cekAtauMintaIzinLokasi() {
@@ -159,7 +176,6 @@ class MainActivity : AppCompatActivity() {
             apiKey = API_KEY
         ).enqueue(object : Callback<WeatherResponse> {
             override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
-                // Hentikan animasi refresh
                 swipeRefresh.isRefreshing = false
 
                 if (response.isSuccessful && response.body() != null) {
@@ -169,6 +185,8 @@ class MainActivity : AppCompatActivity() {
 
                     val iconCode = weather?.icon ?: "01d"
                     updateBackground(iconCode)
+
+                    Toast.makeText(this@MainActivity, "Data cuaca berhasil diperbarui", Toast.LENGTH_SHORT).show()
                 } else {
                     Log.e("CUACA", "Error Response Current: ${response.code()}")
                 }
@@ -191,11 +209,9 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body() != null) {
                     val fullList = response.body()!!.list
 
-                    // Hourly: Ambil 8 interval 3-jam pertama (= 24 jam)
                     val hourlyList = fullList.take(8)
                     rvHourlyForecast.adapter = HourlyAdapter(hourlyList)
 
-                    // 2. SET DAILY ADAPTER (Hitung Suhu Min & Max Asli per Hari)
                     val groupedByDate = fullList.groupBy { it.dtTxt.substring(0, 10) }
                     val dailyList = mutableListOf<ForecastItem>()
 
@@ -256,32 +272,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateBackground(iconCode: String) {
         when (iconCode) {
-            // Cerah Siang
             "01d" -> {
                 ivBackground.setImageResource(R.drawable.sun)
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
             }
-            // Cerah Malam
             "01n" -> {
                 ivBackground.setImageResource(R.drawable.night_clear)
                 ivWeatherIcon.setImageResource(R.drawable.ic_moon)
             }
-            // Berawan Siang
             "02d", "03d", "04d" -> {
                 ivBackground.setImageResource(R.drawable.cloud)
                 ivWeatherIcon.setImageResource(R.drawable.ic_cloud_sun)
             }
-            // Berawan Malam
             "02n", "03n", "04n" -> {
                 ivBackground.setImageResource(R.drawable.night_cloud)
                 ivWeatherIcon.setImageResource(R.drawable.ic_cloud_moon)
             }
-            // Hujan
             "09d", "09n", "10d", "10n" -> {
                 ivBackground.setImageResource(R.drawable.rain)
                 ivWeatherIcon.setImageResource(R.drawable.ic_rain)
             }
-            // Default
             else -> {
                 ivBackground.setImageResource(R.drawable.sun)
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
