@@ -34,17 +34,47 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <!-- 3. Lokasi (STICKY HEADER - Tetap di Atas Saat Di-scroll) -->
+        <!-- Header -->
         <TextView
             android:id="@+id/tvLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:elevation="10dp"
             android:text="Mencari Lokasi..."
             android:textColor="@android:color/white"
             android:textSize="26sp"
             android:textStyle="bold"
+            android:elevation="10dp"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ImageView
+            android:id="@+id/btnSearch"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/ic_search"
+            app:tint="@android:color/white"
+            android:contentDescription="Search"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintTop_toTopOf="@id/tvLocation"
+            app:layout_constraintBottom_toBottomOf="@id/tvLocation"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"
+            android:queryHint="Cari kota..."
+            android:background="@drawable/bg_search"
+            app:iconifiedByDefault="false"
+            app:layout_constraintTop_toBottomOf="@id/tvLocation"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -54,7 +84,7 @@
             android:layout_height="0dp"
             android:fillViewport="true"
             android:overScrollMode="never"
-            app:layout_constraintTop_toBottomOf="@id/tvLocation"
+            app:layout_constraintTop_toBottomOf="@id/searchView"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">

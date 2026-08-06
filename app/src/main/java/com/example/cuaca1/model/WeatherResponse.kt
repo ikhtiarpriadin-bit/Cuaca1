@@ -3,11 +3,17 @@ package com.example.cuaca1.model
 import com.google.gson.annotations.SerializedName
 
 data class WeatherResponse(
+    val coord: Coord,
     val name: String,
     val weather: List<Weather>,
     val main: Main,
     val wind: Wind,
     val visibility: Int
+)
+
+data class Coord(
+    val lat: Double,
+    val lon: Double
 )
 
 data class Weather(
@@ -18,12 +24,16 @@ data class Weather(
 
 data class Main(
     val temp: Double,
+
     @SerializedName("feels_like")
-    val feelsLike: Double, // Ubah tipe data menjadi Double dan masukkan ke dalam constructor
+    val feelsLike: Double,
+
     @SerializedName("temp_min")
     val tempMin: Double,
+
     @SerializedName("temp_max")
     val tempMax: Double,
+
     val pressure: Int,
     val humidity: Int
 )

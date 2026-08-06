@@ -8,17 +8,26 @@ import retrofit2.http.Query
 
 interface CuacaApi {
 
-    // Fetch cuaca saat ini
+    // Cuaca berdasarkan koordinat GPS
     @GET("data/2.5/weather")
     fun getWeather(
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
         @Query("appid") apiKey: String,
         @Query("units") units: String = "metric",
-        @Query("lang") lang: String = "id" // Tambahkan param lang agar deskripsi cuaca Bahasa Indonesia
+        @Query("lang") lang: String = "id"
     ): Call<WeatherResponse>
 
-    // Fetch cuaca prakiraan 5 hari / per 3 jam
+    // Cuaca berdasarkan nama kota
+    @GET("data/2.5/weather")
+    fun getWeatherByCity(
+        @Query("q") city: String,
+        @Query("appid") apiKey: String,
+        @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "id"
+    ): Call<WeatherResponse>
+
+    // Forecast 5 hari
     @GET("data/2.5/forecast")
     fun getForecast(
         @Query("lat") lat: Double,
@@ -27,5 +36,4 @@ interface CuacaApi {
         @Query("units") units: String = "metric",
         @Query("lang") lang: String = "id"
     ): Call<ForecastResponse>
-
 }

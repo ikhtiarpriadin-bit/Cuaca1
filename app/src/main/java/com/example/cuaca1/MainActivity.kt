@@ -1,12 +1,14 @@
 package com.example.cuaca1
 
 import android.Manifest
+import androidx.appcompat.widget.SearchView
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -37,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var swipeRefresh: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var ivSearch: ImageView
+    private lateinit var searchView: SearchView
 
     // UI Utama
     private lateinit var ivBackground: ImageView
@@ -88,6 +92,41 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(0, 0, 0, systemBars.bottom)
             insets
         }
+        searchView = findViewById(R.id.searchView)
+
+        searchView.setOnCloseListener {
+
+            searchView.visibility = View.GONE
+            true
+
+        }
+
+        ivSearch = findViewById(R.id.btnSearch)
+        ivSearch.setOnClickListener {
+            ivSearch.visibility = View.GONE
+
+            searchView.visibility = View.VISIBLE
+            searchView.isIconified = false
+            searchView.requestFocus()
+        }
+        searchView.clearFocus()
+        searchView.setOnQueryTextListener(object :
+            SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+
+                if (!query.isNullOrEmpty()) {
+                    cariKota(query)
+                }
+
+                searchView.clearFocus()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
 
         // Bind SwipeRefreshLayout
         swipeRefresh = findViewById(R.id.swipeRefresh)
@@ -118,6 +157,125 @@ class MainActivity : AppCompatActivity() {
         rvDailyForecast.layoutManager = LinearLayoutManager(this)
 
         cekAtauMintaIzinLokasi()
+    }
+    private fun cariKota(city: String) {
+
+        swipeRefresh.isRefreshing = true
+
+        RetrofitClient.api.getWeatherByCity(
+            city = city,
+            apiKey = API_KEY
+        ).enqueue(object : Callback<WeatherResponse> {
+
+            override fun onResponse(
+                call: Call<WeatherResponse>,
+                response: Response<WeatherResponse>
+            ) {
+
+                swipeRefresh.isRefreshing = false
+
+                if (response.isSuccessful && response.body() != null) {
+
+                    val data = response.body()!!
+
+                    updateUI(data)
+
+                    val weather = data.weather.firstOrNull()
+
+                    updateBackground(weather?.icon ?: "01d")
+
+                    ambilForecast(data.coord.lat, data.coord.lon)
+
+                } else {
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Kota tidak ditemukan",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                }
+
+            }
+
+            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+
+                swipeRefresh.isRefreshing = false
+
+                Toast.makeText(
+                    this@MainActivity,
+                    "Gagal mencari kota",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            }
+
+        })
+
+    }
+    private fun ambilForecast(
+        latitude: Double,
+        longitude: Double
+    ) {
+
+        RetrofitClient.api.getForecast(
+            lat = latitude,
+            lon = longitude,
+            apiKey = API_KEY
+        ).enqueue(object : Callback<ForecastResponse> {
+
+            override fun onResponse(
+                call: Call<ForecastResponse>,
+                response: Response<ForecastResponse>
+            ) {
+
+                if (response.isSuccessful && response.body() != null) {
+
+                    val fullList = response.body()!!.list
+
+                    rvHourlyForecast.adapter =
+                        HourlyAdapter(fullList.take(8))
+
+                    val grouped = fullList.groupBy {
+                        it.dtTxt.substring(0, 10)
+                    }
+
+                    val dailyList = mutableListOf<ForecastItem>()
+
+                    grouped.forEach { (_, items) ->
+
+                        val min = items.minOf { it.main.tempMin }
+                        val max = items.maxOf { it.main.tempMax }
+
+                        val sample =
+                            items.find { it.dtTxt.contains("12:00") }
+                                ?: items.first()
+
+                        dailyList.add(
+                            sample.copy(
+                                main = sample.main.copy(
+                                    tempMin = min,
+                                    tempMax = max
+                                )
+                            )
+                        )
+                    }
+
+                    rvDailyForecast.adapter =
+                        DailyAdapter(dailyList)
+
+                }
+
+            }
+
+            override fun onFailure(
+                call: Call<ForecastResponse>,
+                t: Throwable
+            ) {
+            }
+
+        })
+
     }
 
     private fun setStatusBarTransparent() {
@@ -297,5 +455,20 @@ class MainActivity : AppCompatActivity() {
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
             }
         }
+    }
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+
+        if (searchView.visibility == View.VISIBLE) {
+
+            searchView.setQuery("", false)
+            searchView.clearFocus()
+            searchView.visibility = View.GONE
+
+            ivSearch.visibility = View.VISIBLE
+            return
+        }
+
+        super.onBackPressed()
     }
 }
