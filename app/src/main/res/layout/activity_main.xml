@@ -234,6 +234,11 @@
                                 android:orientation="vertical"
                                 android:gravity="center_vertical">
 
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_humidity"/>
+
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -270,6 +275,11 @@
                                 android:padding="16dp"
                                 android:orientation="vertical"
                                 android:gravity="center_vertical">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_wind"/>
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -308,6 +318,11 @@
                                 android:orientation="vertical"
                                 android:gravity="center_vertical">
 
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_pressure"/>
+
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -344,6 +359,11 @@
                                 android:padding="16dp"
                                 android:orientation="vertical"
                                 android:gravity="center_vertical">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_visibility"/>
 
                                 <TextView
                                     android:layout_width="wrap_content"
