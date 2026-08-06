@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     private val API_KEY = "277e22a7fbc5477aedc466d91c974316"
 
+    private lateinit var swipeRefresh: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     // UI Utama
@@ -79,6 +80,12 @@ class MainActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        // Bind SwipeRefreshLayout
+        swipeRefresh = findViewById(R.id.swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            dapatkanLokasiPerangkat()
         }
 
         // Bind View ID Utama
@@ -152,14 +159,15 @@ class MainActivity : AppCompatActivity() {
             apiKey = API_KEY
         ).enqueue(object : Callback<WeatherResponse> {
             override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
+                // Hentikan animasi refresh
+                swipeRefresh.isRefreshing = false
+
                 if (response.isSuccessful && response.body() != null) {
                     val data = response.body()!!
                     val weather = data.weather.firstOrNull()
                     updateUI(data)
 
-// Ambil icon dari API (01d, 01n, 02d, dst)
                     val iconCode = weather?.icon ?: "01d"
-
                     updateBackground(iconCode)
                 } else {
                     Log.e("CUACA", "Error Response Current: ${response.code()}")
@@ -167,7 +175,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+                swipeRefresh.isRefreshing = false
                 Log.e("CUACA", "Failure Current: ${t.message}")
+                Toast.makeText(this@MainActivity, "Gagal memperbarui data cuaca", Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -190,18 +200,15 @@ class MainActivity : AppCompatActivity() {
                     val dailyList = mutableListOf<ForecastItem>()
 
                     for ((_, itemsInDay) in groupedByDate) {
-                        // Cari suhu terendah & tertinggi (aman meskipun data hari ini sisa sedikit)
                         val realMinTemp = itemsInDay.minOfOrNull { it.main.tempMin } ?: 0.0
                         val realMaxTemp = itemsInDay.maxOfOrNull { it.main.tempMax } ?: 0.0
 
-                        // Pilih item sampel: gunakan item tengah jika ada banyak data, atau item pertama jika sisa sedikit
                         val sampleItem =
                             itemsInDay.find { it.dtTxt.contains("09:00:00") }
                                 ?: itemsInDay.find { it.dtTxt.contains("12:00:00") }
                                 ?: itemsInDay.find { it.dtTxt.contains("15:00:00") }
                                 ?: itemsInDay.first()
 
-                        // Copy nilai min & max yang sudah terkumpul
                         val updatedMain = sampleItem.main.copy(
                             tempMin = realMinTemp,
                             tempMax = realMaxTemp
@@ -248,40 +255,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateBackground(iconCode: String) {
-
         when (iconCode) {
-
             // Cerah Siang
             "01d" -> {
                 ivBackground.setImageResource(R.drawable.sun)
                 ivWeatherIcon.setImageResource(R.drawable.ic_sun)
             }
-
             // Cerah Malam
             "01n" -> {
                 ivBackground.setImageResource(R.drawable.night_clear)
                 ivWeatherIcon.setImageResource(R.drawable.ic_moon)
             }
-
             // Berawan Siang
             "02d", "03d", "04d" -> {
                 ivBackground.setImageResource(R.drawable.cloud)
                 ivWeatherIcon.setImageResource(R.drawable.ic_cloud_sun)
             }
-
             // Berawan Malam
             "02n", "03n", "04n" -> {
                 ivBackground.setImageResource(R.drawable.night_cloud)
                 ivWeatherIcon.setImageResource(R.drawable.ic_cloud_moon)
             }
-
             // Hujan
-            "09d", "09n",
-            "10d", "10n" -> {
+            "09d", "09n", "10d", "10n" -> {
                 ivBackground.setImageResource(R.drawable.rain)
                 ivWeatherIcon.setImageResource(R.drawable.ic_rain)
             }
-
             // Default
             else -> {
                 ivBackground.setImageResource(R.drawable.sun)
