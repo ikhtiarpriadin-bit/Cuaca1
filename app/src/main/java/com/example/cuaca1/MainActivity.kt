@@ -56,6 +56,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvWind: TextView
     private lateinit var tvPressure: TextView
     private lateinit var tvVisibility: TextView
+    private lateinit var tvSunrise: TextView
+    private lateinit var tvSunset: TextView
 
     // RecyclerView Forecast
     private lateinit var rvHourlyForecast: RecyclerView
@@ -105,6 +107,8 @@ class MainActivity : AppCompatActivity() {
         tvWind = findViewById(R.id.tvWind)
         tvPressure = findViewById(R.id.tvPressure)
         tvVisibility = findViewById(R.id.tvVisibility)
+        tvSunrise = findViewById(R.id.tvSunrise)
+        tvSunset = findViewById(R.id.tvSunset)
 
         // Bind RecyclerView
         rvHourlyForecast = findViewById(R.id.rvHourlyForecast)
@@ -319,7 +323,21 @@ class MainActivity : AppCompatActivity() {
         tvWind.text = "${data.wind.speed} m/s"
         tvPressure.text = "${data.main.pressure} hPa"
         tvVisibility.text = "${data.visibility / 1000} km"
+
+        val sunrise = java.text.SimpleDateFormat(
+            "HH:mm",
+            java.util.Locale.getDefault()
+        ).format(java.util.Date(data.sys.sunrise * 1000))
+
+        val sunset = java.text.SimpleDateFormat(
+            "HH:mm",
+            java.util.Locale.getDefault()
+        ).format(java.util.Date(data.sys.sunset * 1000))
+
+        tvSunrise.text = sunrise
+        tvSunset.text = sunset
     }
+
 
     private fun updateBackground(iconCode: String) {
         when (iconCode) {

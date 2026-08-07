@@ -384,7 +384,91 @@
 
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+                        <!-- Sunrise -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="110dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="5dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardBackgroundColor="#26FFFFFF"
+                            app:cardElevation="0dp">
 
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="16dp"
+                                android:orientation="vertical"
+                                android:gravity="center_vertical">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_sunrise" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Matahari Terbit"
+                                    android:textSize="13sp"
+                                    android:textColor="#B3FFFFFF"/>
+
+                                <TextView
+                                    android:id="@+id/tvSunrise"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="06:15"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@android:color/white"/>
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Sunset -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="110dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="5dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardBackgroundColor="#26FFFFFF"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="16dp"
+                                android:orientation="vertical"
+                                android:gravity="center_vertical">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_sunset" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Matahari Terbenam"
+                                    android:textSize="13sp"
+                                    android:textColor="#B3FFFFFF"/>
+
+                                <TextView
+                                    android:id="@+id/tvSunset"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="18:22"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@android:color/white"/>
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
                     </GridLayout>
 
                 </LinearLayout>

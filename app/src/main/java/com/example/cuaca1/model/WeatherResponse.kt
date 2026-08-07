@@ -8,7 +8,8 @@ data class WeatherResponse(
     val weather: List<Weather>,
     val main: Main,
     val wind: Wind,
-    val visibility: Int
+    val visibility: Int,
+    val sys: Sys
 )
 
 data class Coord(
@@ -40,4 +41,9 @@ data class Main(
 
 data class Wind(
     val speed: Double
+)
+
+data class Sys(
+    val sunrise: Long,
+    val sunset: Long
 )
