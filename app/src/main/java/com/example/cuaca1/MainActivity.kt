@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cuaca1.adapter.DailyAdapter
@@ -43,8 +44,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var ivSearch: ImageView
     private lateinit var searchView: SearchView
+    private lateinit var nestedScrollView: NestedScrollView
 
-    // UI Utama
+    // UI Utama (Hero Weather)
     private lateinit var ivBackground: ImageView
     private lateinit var ivWeatherIcon: ImageView
     private lateinit var tvLocation: TextView
@@ -96,6 +98,9 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        // Bind ScrollView
+        nestedScrollView = findViewById(R.id.nestedScrollView)
+
         // Bind View Utama & Detail
         ivBackground = findViewById(R.id.ivBackground)
         ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
@@ -116,6 +121,9 @@ class MainActivity : AppCompatActivity() {
         rvDailyForecast = findViewById(R.id.rvDailyForecast)
         rvHourlyForecast.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvDailyForecast.layoutManager = LinearLayoutManager(this)
+
+        // Setup Staggered Scroll Fade Animation
+        setupScrollFadeAnimation()
 
         // Setup Search
         ivSearch = findViewById(R.id.btnSearch)
@@ -162,6 +170,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         cekAtauMintaIzinLokasi()
+    }
+
+    private fun setupScrollFadeAnimation() {
+        nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
+            // Suhu (tvTemperature) menghilang paling cepat (jarak 180px)
+            val tempAlpha = 1f - (scrollY / 180f).coerceIn(0f, 1f)
+            tvTemperature.alpha = tempAlpha
+
+            // Ikon & Feels Like menghilang di jarak menengah (jarak 260px)
+            val midAlpha = 1f - (scrollY / 260f).coerceIn(0f, 1f)
+            ivWeatherIcon.alpha = midAlpha
+            tvFeelsLike.alpha = midAlpha
+
+            // Kondisi cuaca menghilang sedikit lebih lambat (jarak 320px)
+            val conditionAlpha = 1f - (scrollY / 320f).coerceIn(0f, 1f)
+            tvCondition.alpha = conditionAlpha
+        })
     }
 
     private fun setStatusBarTransparent() {
