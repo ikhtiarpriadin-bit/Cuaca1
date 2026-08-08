@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -141,7 +142,19 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextChange(newText: String?): Boolean = false
         })
 
-        // SwipeRefresh (Menggunakan spinner normal bawaan Android)
+        // Back gesture / tombol Back modern
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (searchView.visibility == View.VISIBLE) {
+                    closeSearch()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
+
+        // SwipeRefresh
         swipeRefresh = findViewById(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
             Toast.makeText(this, "Memperbarui data cuaca...", Toast.LENGTH_SHORT).show()
@@ -244,8 +257,14 @@ class MainActivity : AppCompatActivity() {
                     closeSearch()
                 } else {
                     Toast.makeText(this@MainActivity, "Kota \"$city\" tidak ditemukan", Toast.LENGTH_SHORT).show()
+
+                    // Mencegah keyboard tertutup jika pencarian gagal
                     searchView.isIconified = false
                     searchView.requestFocus()
+                    searchView.post {
+                        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT)
+                    }
                 }
             }
 
@@ -340,7 +359,6 @@ class MainActivity : AppCompatActivity() {
         tvSunset.text = sunset
     }
 
-
     private fun updateBackground(iconCode: String) {
         when (iconCode) {
             "01d" -> {
@@ -425,14 +443,5 @@ class MainActivity : AppCompatActivity() {
                 ivSearch.visibility = View.VISIBLE
             }
             .start()
-    }
-
-    @Suppress("DEPRECATION")
-    override fun onBackPressed() {
-        if (searchView.visibility == View.VISIBLE) {
-            closeSearch()
-            return
-        }
-        super.onBackPressed()
     }
 }
