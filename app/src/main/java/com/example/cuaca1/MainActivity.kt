@@ -309,6 +309,8 @@ class MainActivity : AppCompatActivity() {
             "Thunderstorm" -> "Badai Petir"
             "Drizzle" -> "Gerimis"
             "Mist", "Fog" -> "Berkabut"
+            "Haze" -> "Berkabut"
+            "Smoke" -> "Berasap"
             else -> weather
         }
     }
@@ -360,6 +362,14 @@ class MainActivity : AppCompatActivity() {
             "09d", "09n", "10d", "10n" -> {
                 ivBackground.setImageResource(R.drawable.rain)
                 ivWeatherIcon.setImageResource(R.drawable.ic_rain)
+            }
+            "11d", "11n" -> {
+                ivBackground.setImageResource(R.drawable.thunderstorm)
+                ivWeatherIcon.setImageResource(R.drawable.ic_thunderstorm)
+            }
+            "50d", "50n" -> {
+                ivBackground.setImageResource(R.drawable.fog)
+                ivWeatherIcon.setImageResource(R.drawable.ic_fog)
             }
             else -> {
                 ivBackground.setImageResource(R.drawable.sun)
