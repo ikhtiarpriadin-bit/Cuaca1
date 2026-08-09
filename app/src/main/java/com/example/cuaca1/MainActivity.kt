@@ -327,7 +327,6 @@ class MainActivity : AppCompatActivity() {
                     updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
                     ambilForecast(data.coord.lat, data.coord.lon)
 
-                    // Toast Feedback UX saat berhasil refresh
                     if (wasPullRefreshing) {
                         Toast.makeText(this@MainActivity, "Data cuaca ${data.name} diperbarui", Toast.LENGTH_SHORT).show()
                     }
@@ -479,7 +478,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun openSearch() {
         if (searchView.visibility == View.VISIBLE) return
+
         ivSearch.visibility = View.GONE
+        tvLocation.visibility = View.INVISIBLE // Sembunyikan nama kota agar SearchView tidak bertumpukan
+
         searchView.visibility = View.VISIBLE
         searchView.alpha = 0f
         searchView.translationY = -20f
@@ -500,6 +502,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun closeSearch() {
         if (searchView.visibility == View.GONE) return
+
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(currentFocus?.windowToken ?: searchView.windowToken, 0)
 
@@ -515,7 +518,9 @@ class MainActivity : AppCompatActivity() {
                 searchView.visibility = View.GONE
                 searchView.alpha = 1f
                 searchView.translationY = 0f
+
                 ivSearch.visibility = View.VISIBLE
+                tvLocation.visibility = View.VISIBLE // Tampilkan nama kota kembali
             }
             .start()
     }
