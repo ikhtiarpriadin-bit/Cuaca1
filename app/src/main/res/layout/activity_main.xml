@@ -1,103 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/swipeRefresh"
+    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+    <!-- 1. Gambar Background -->
+    <ImageView
+        android:id="@+id/ivBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        android:scaleType="centerCrop"
+        android:src="@drawable/sun"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- 1. Gambar Background -->
-        <ImageView
-            android:id="@+id/ivBackground"
+    <!-- 2. Overlay Gelap Halus -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_overlay"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <!-- 3. Indikator Status Refresh Custom -->
+    <TextView
+        android:id="@+id/tvPullToRefresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Tarik untuk memperbarui"
+        android:textColor="#CCFFFFFF"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:alpha="0"
+        android:elevation="5dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- 4. CONTAINER HEADER & CONTENT YANG BISA DITARIK -->
+    <LinearLayout
+        android:id="@+id/pullContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Header Fixed (Nama Kota & Search) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/sun"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <!-- 2. Overlay Gelap Halus -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/bg_overlay"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <!-- 3. HEADER PINNED (Lokasi & Search Tetap Di Atas) -->
-        <TextView
-            android:id="@+id/tvLocation"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="Mencari Lokasi..."
-            android:textColor="@android:color/white"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:elevation="10dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:paddingTop="36dp"
+            android:paddingBottom="8dp">
 
-        <ImageView
-            android:id="@+id/btnSearch"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginEnd="20dp"
-            android:src="@drawable/ic_search"
-            app:tint="@android:color/white"
-            android:contentDescription="Search"
-            android:clickable="true"
-            android:focusable="true"
-            android:elevation="10dp"
-            app:layout_constraintTop_toTopOf="@id/tvLocation"
-            app:layout_constraintBottom_toBottomOf="@id/tvLocation"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            <!-- Nama Kota Utama -->
+            <TextView
+                android:id="@+id/tvLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mencari Lokasi..."
+                android:textColor="@android:color/white"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="12dp"
-            android:visibility="gone"
-            android:queryHint="Cari kota..."
-            android:background="@drawable/bg_search"
-            android:elevation="10dp"
-            app:iconifiedByDefault="false"
-            app:layout_constraintTop_toBottomOf="@id/tvLocation"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            <!-- Tombol Search -->
+            <ImageView
+                android:id="@+id/btnSearch"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/ic_search"
+                app:tint="@android:color/white"
+                android:contentDescription="Search"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="@id/tvLocation"
+                app:layout_constraintBottom_toBottomOf="@id/tvLocation"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- 4. ScrollView Utama -->
+            <!-- Form Pencarian (SearchView) -->
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchView"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                android:queryHint="Cari kota..."
+                android:background="@drawable/bg_search"
+                app:iconifiedByDefault="false"
+                app:layout_constraintTop_toBottomOf="@id/tvLocation"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- ScrollView Utama -->
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nestedScrollView"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_weight="1"
             android:fillViewport="true"
-            android:overScrollMode="never"
-            app:layout_constraintTop_toBottomOf="@id/tvLocation"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:overScrollMode="never">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="16dp">
+                android:orientation="vertical">
 
-                <!-- Suhu Utama & Icon (Fade Out saat Scroll) -->
+                <!-- Suhu Utama & Icon -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -144,7 +168,7 @@
                     android:textColor="#E6FFFFFF"
                     android:textSize="14sp"/>
 
-                <!-- CONTAINER CONTAINER PERKIRAAN PER JAM (CARD UTUH) -->
+                <!-- CONTAINER PERKIRAAN PER JAM -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -170,14 +194,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
-                        <!-- Garis Pemisah Transparan Tipis -->
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginTop="12dp"
                             android:background="#1AFFFFFF" />
 
-                        <!-- RecyclerView Per Jam Horizontal -->
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rvHourlyForecast"
                             android:layout_width="match_parent"
@@ -194,7 +216,7 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <!-- Container Bagian Bawah -->
+                <!-- CONTAINER BAGIAN BAWAH (DAILY & GRID) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -237,7 +259,7 @@
 
                     </androidx.cardview.widget.CardView>
 
-                    <!-- GRID DETAIL CUACA 2x3 Clean (6 Kartu) -->
+                    <!-- GRID DETAIL CUACA -->
                     <GridLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -504,6 +526,6 @@
 
         </androidx.core.widget.NestedScrollView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
