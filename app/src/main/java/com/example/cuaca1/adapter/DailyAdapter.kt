@@ -19,6 +19,7 @@ class DailyAdapter(private val list: List<ForecastItem>) :
         val tvDay: TextView = view.findViewById(R.id.tvDailyDay)
         val tvTempMinMax: TextView = view.findViewById(R.id.tvDailyTemp)
         val imgIcon: ImageView = view.findViewById(R.id.imgDailyIcon)
+        val divider: View = view.findViewById(R.id.dailyDivider) // Tambahan untuk divider
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -50,14 +51,19 @@ class DailyAdapter(private val list: List<ForecastItem>) :
 
         val iconCode = item.weather.firstOrNull()?.icon ?: ""
         holder.imgIcon.setImageResource(getWeatherIcon(iconCode))
+
+        // Logika menyembunyikan garis divider pada item paling bawah (ujung card)
+        if (position == list.size - 1) {
+            holder.divider.visibility = View.GONE
+        } else {
+            holder.divider.visibility = View.VISIBLE
+        }
     }
 
     override fun getItemCount() = list.size
 
     private fun getWeatherIcon(iconCode: String): Int {
-
         return when (iconCode) {
-
             // Cerah
             "01d" -> R.drawable.ic_sun
             "01n" -> R.drawable.ic_moon
