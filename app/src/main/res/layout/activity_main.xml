@@ -79,7 +79,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- 4. ScrollView Utama (Dimulai dari bawah Header / SearchView) -->
+        <!-- 4. ScrollView Utama -->
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nestedScrollView"
             android:layout_width="0dp"
@@ -97,7 +97,7 @@
                 android:orientation="vertical"
                 android:paddingTop="16dp">
 
-                <!-- Suhu Utama & Icon (Komponen ini yang akan Fade-Out saat Scroll) -->
+                <!-- Suhu Utama & Icon (Fade Out saat Scroll) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -144,31 +144,55 @@
                     android:textColor="#E6FFFFFF"
                     android:textSize="14sp"/>
 
-                <!-- Judul Per Jam -->
-                <TextView
-                    android:id="@+id/tvHourlyTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:paddingHorizontal="24dp"
-                    android:text="Perkiraan Per Jam"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold"
-                    android:textSize="18sp"/>
-
-                <!-- RecyclerView Per Jam -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvHourlyForecast"
+                <!-- CONTAINER CONTAINER PERKIRAAN PER JAM (CARD UTUH) -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal"
-                    android:overScrollMode="never"
-                    android:clipToPadding="false"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_hourly_forecast"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="20dp"
+                    app:cardBackgroundColor="#26FFFFFF"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingVertical="16dp">
+
+                        <TextView
+                            android:id="@+id/tvHourlyTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="16dp"
+                            android:text="Perkiraan Per Jam"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <!-- Garis Pemisah Transparan Tipis -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="12dp"
+                            android:background="#1AFFFFFF" />
+
+                        <!-- RecyclerView Per Jam Horizontal -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvHourlyForecast"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:clipToPadding="false"
+                            android:orientation="horizontal"
+                            android:overScrollMode="never"
+                            android:paddingHorizontal="8dp"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:listitem="@layout/item_hourly_forecast" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
                 <!-- Container Bagian Bawah -->
                 <LinearLayout
@@ -177,7 +201,7 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Card Forecast 5 Hari (Latar Transparan Halus) -->
+                    <!-- Card Forecast Harian -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
