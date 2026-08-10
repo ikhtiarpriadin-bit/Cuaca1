@@ -8,53 +8,58 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- 1. Gambar Background -->
+    <!-- ================================================================= -->
+    <!-- 1. BACKGROUND & OVERLAY                                           -->
+    <!-- ================================================================= -->
     <ImageView
         android:id="@+id/ivBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/sun"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 2. Overlay Gelap Halus -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_overlay"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 3. Indikator Status Refresh Custom -->
+    <!-- ================================================================= -->
+    <!-- 2. PULL TO REFRESH INDICATOR                                      -->
+    <!-- ================================================================= -->
     <TextView
         android:id="@+id/tvPullToRefresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:alpha="0"
+        android:elevation="5dp"
         android:text="Tarik untuk memperbarui"
         android:textColor="#CCFFFFFF"
         android:textSize="13sp"
         android:textStyle="bold"
-        android:alpha="0"
-        android:elevation="5dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 4. HEADER FIXED (Di luar pullContainer agarSearchView tidak memicu efek tarik) -->
+    <!-- ================================================================= -->
+    <!-- 3. HEADER NAVBAR (Nama Kota, Tombol Search & Settings)             -->
+    <!-- ================================================================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elevation="10dp"
         android:paddingTop="36dp"
         android:paddingBottom="8dp"
-        android:elevation="10dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/tvLocation"
@@ -62,55 +67,72 @@
             android:layout_height="wrap_content"
             android:text="Mencari Lokasi..."
             android:textColor="@android:color/white"
-            android:textSize="26sp"
+            android:textSize="24sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Tombol Cari Kota -->
         <ImageView
             android:id="@+id/btnSearch"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:layout_marginEnd="20dp"
-            android:src="@drawable/ic_search"
-            app:tint="@android:color/white"
-            android:contentDescription="Search"
+            android:layout_marginEnd="12dp"
             android:clickable="true"
+            android:contentDescription="Search"
             android:focusable="true"
-            app:layout_constraintTop_toTopOf="@id/tvLocation"
+            android:src="@drawable/ic_search"
             app:layout_constraintBottom_toBottomOf="@id/tvLocation"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toStartOf="@id/btnSettings"
+            app:layout_constraintTop_toTopOf="@id/tvLocation"
+            app:tint="@android:color/white" />
 
-        <!-- SearchView melayang penuh di area header -->
+        <!-- Tombol Settings (Ditaruh di Pojok Kanan Atas) -->
+        <ImageView
+            android:id="@+id/btnSettings"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="20dp"
+            android:clickable="true"
+            android:contentDescription="Settings"
+            android:focusable="true"
+            android:src="@drawable/ic_set"
+            app:tint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@id/tvLocation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvLocation" />
+
+        <!-- SearchView Melayang Saat Pencarian Aktif -->
         <androidx.appcompat.widget.SearchView
             android:id="@+id/searchView"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:visibility="gone"
-            android:queryHint="Cari kota..."
             android:background="@drawable/bg_search"
+            android:queryHint="Cari kota..."
+            android:visibility="gone"
             app:iconifiedByDefault="false"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 5. CONTAINER CONTENT (Khusus area yang ditarik untuk refresh) -->
+    <!-- ================================================================= -->
+    <!-- 4. KONTEN UTAMA (AREA SCROLLING & REFRESH)                         -->
+    <!-- ================================================================= -->
     <LinearLayout
         android:id="@+id/pullContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/headerContainer"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerContainer">
 
-        <!-- ScrollView Utama -->
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
@@ -123,23 +145,23 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Suhu Utama & Icon -->
+                <!-- INFORMASI SUHU UTAMA -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="24dp"
-                    android:layout_marginTop="8dp">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="24dp">
 
                     <TextView
                         android:id="@+id/tvTemperature"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-light"
                         android:text="--°"
                         android:textColor="@android:color/white"
-                        android:textSize="80sp"
-                        android:fontFamily="sans-serif-light"/>
+                        android:textSize="80sp" />
 
                     <ImageView
                         android:id="@+id/ivWeatherIcon"
@@ -147,10 +169,10 @@
                         android:layout_height="60dp"
                         android:layout_marginStart="16dp"
                         android:contentDescription="Weather Icon"
-                        android:src="@drawable/ic_sun"/>
+                        android:src="@drawable/ic_sun" />
                 </LinearLayout>
 
-                <!-- Kondisi Cuaca -->
+                <!-- KONDISI CUACA TEKS -->
                 <TextView
                     android:id="@+id/tvCondition"
                     android:layout_width="wrap_content"
@@ -159,7 +181,7 @@
                     android:text="Memuat cuaca..."
                     android:textColor="@android:color/white"
                     android:textSize="18sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvFeelsLike"
@@ -169,9 +191,9 @@
                     android:paddingHorizontal="24dp"
                     android:text="Menghubungkan ke satelit GPS..."
                     android:textColor="#E6FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
 
-                <!-- CONTAINER PERKIRAAN PER JAM -->
+                <!-- CARD 1: PERKIRAAN PER JAM (HOURLY FORECAST) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -226,7 +248,7 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Card Forecast Harian -->
+                    <!-- CARD 2: PERKIRAAN HARIAN (DAILY FORECAST) -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -246,8 +268,8 @@
                                 android:layout_height="wrap_content"
                                 android:text="Perkiraan Harian"
                                 android:textColor="@android:color/white"
-                                android:textStyle="bold"
-                                android:textSize="16sp"/>
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
 
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/rvDailyForecast"
@@ -256,47 +278,47 @@
                                 android:layout_marginTop="8dp"
                                 android:nestedScrollingEnabled="false"
                                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                                tools:listitem="@layout/item_daily_forecast"/>
+                                tools:listitem="@layout/item_daily_forecast" />
 
                         </LinearLayout>
 
                     </androidx.cardview.widget.CardView>
 
-                    <!-- GRID DETAIL CUACA -->
+                    <!-- CARD 3: GRID DETAIL CUACA -->
                     <GridLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:columnCount="2"
                         android:rowCount="3">
 
-                        <!-- Kelembapan -->
+                        <!-- Item Grid 1: Kelembapan -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="110dp"
-                            android:layout_columnWeight="1"
                             android:layout_margin="5dp"
-                            app:cardCornerRadius="20dp"
+                            android:layout_columnWeight="1"
                             app:cardBackgroundColor="#26FFFFFF"
+                            app:cardCornerRadius="20dp"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:padding="16dp"
+                                android:gravity="center_vertical"
                                 android:orientation="vertical"
-                                android:gravity="center_vertical">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="18dp"
                                     android:layout_height="18dp"
-                                    android:src="@drawable/ic_humidity"/>
+                                    android:src="@drawable/ic_humidity" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Kelembapan"
-                                    android:textSize="13sp"
-                                    android:textColor="#B3FFFFFF"/>
+                                    android:textColor="#B3FFFFFF"
+                                    android:textSize="13sp" />
 
                                 <TextView
                                     android:id="@+id/tvHumidity"
@@ -304,41 +326,41 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
                                     android:text="75%"
+                                    android:textColor="@android:color/white"
                                     android:textSize="22sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@android:color/white"/>
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Kecepatan Angin -->
+                        <!-- Item Grid 2: Kecepatan Angin -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="110dp"
-                            android:layout_columnWeight="1"
                             android:layout_margin="5dp"
-                            app:cardCornerRadius="20dp"
+                            android:layout_columnWeight="1"
                             app:cardBackgroundColor="#26FFFFFF"
+                            app:cardCornerRadius="20dp"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:padding="16dp"
+                                android:gravity="center_vertical"
                                 android:orientation="vertical"
-                                android:gravity="center_vertical">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="18dp"
                                     android:layout_height="18dp"
-                                    android:src="@drawable/ic_wind"/>
+                                    android:src="@drawable/ic_wind" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Kecepatan Angin"
-                                    android:textSize="13sp"
-                                    android:textColor="#B3FFFFFF"/>
+                                    android:textColor="#B3FFFFFF"
+                                    android:textSize="13sp" />
 
                                 <TextView
                                     android:id="@+id/tvWind"
@@ -346,41 +368,41 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
                                     android:text="10 m/s"
+                                    android:textColor="@android:color/white"
                                     android:textSize="22sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@android:color/white"/>
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Tekanan Udara -->
+                        <!-- Item Grid 3: Tekanan Udara -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="110dp"
-                            android:layout_columnWeight="1"
                             android:layout_margin="5dp"
-                            app:cardCornerRadius="20dp"
+                            android:layout_columnWeight="1"
                             app:cardBackgroundColor="#26FFFFFF"
+                            app:cardCornerRadius="20dp"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:padding="16dp"
+                                android:gravity="center_vertical"
                                 android:orientation="vertical"
-                                android:gravity="center_vertical">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="18dp"
                                     android:layout_height="18dp"
-                                    android:src="@drawable/ic_pressure"/>
+                                    android:src="@drawable/ic_pressure" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Tekanan Udara"
-                                    android:textSize="13sp"
-                                    android:textColor="#B3FFFFFF"/>
+                                    android:textColor="#B3FFFFFF"
+                                    android:textSize="13sp" />
 
                                 <TextView
                                     android:id="@+id/tvPressure"
@@ -388,41 +410,41 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
                                     android:text="1012 hPa"
+                                    android:textColor="@android:color/white"
                                     android:textSize="22sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@android:color/white"/>
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Jarak Pandang -->
+                        <!-- Item Grid 4: Jarak Pandang -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="110dp"
-                            android:layout_columnWeight="1"
                             android:layout_margin="5dp"
-                            app:cardCornerRadius="20dp"
+                            android:layout_columnWeight="1"
                             app:cardBackgroundColor="#26FFFFFF"
+                            app:cardCornerRadius="20dp"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:padding="16dp"
+                                android:gravity="center_vertical"
                                 android:orientation="vertical"
-                                android:gravity="center_vertical">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="18dp"
                                     android:layout_height="18dp"
-                                    android:src="@drawable/ic_visibility"/>
+                                    android:src="@drawable/ic_visibility" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Jarak Pandang"
-                                    android:textSize="13sp"
-                                    android:textColor="#B3FFFFFF"/>
+                                    android:textColor="#B3FFFFFF"
+                                    android:textSize="13sp" />
 
                                 <TextView
                                     android:id="@+id/tvVisibility"
@@ -430,29 +452,29 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
                                     android:text="10 km"
+                                    android:textColor="@android:color/white"
                                     android:textSize="22sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@android:color/white"/>
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Sunrise -->
+                        <!-- Item Grid 5: Sunrise -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="110dp"
-                            android:layout_columnWeight="1"
                             android:layout_margin="5dp"
-                            app:cardCornerRadius="20dp"
+                            android:layout_columnWeight="1"
                             app:cardBackgroundColor="#26FFFFFF"
+                            app:cardCornerRadius="20dp"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:padding="16dp"
+                                android:gravity="center_vertical"
                                 android:orientation="vertical"
-                                android:gravity="center_vertical">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="18dp"
@@ -463,8 +485,8 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Matahari Terbit"
-                                    android:textSize="13sp"
-                                    android:textColor="#B3FFFFFF"/>
+                                    android:textColor="#B3FFFFFF"
+                                    android:textSize="13sp" />
 
                                 <TextView
                                     android:id="@+id/tvSunrise"
@@ -472,29 +494,29 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
                                     android:text="06:15"
+                                    android:textColor="@android:color/white"
                                     android:textSize="22sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@android:color/white"/>
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Sunset -->
+                        <!-- Item Grid 6: Sunset -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="110dp"
-                            android:layout_columnWeight="1"
                             android:layout_margin="5dp"
-                            app:cardCornerRadius="20dp"
+                            android:layout_columnWeight="1"
                             app:cardBackgroundColor="#26FFFFFF"
+                            app:cardCornerRadius="20dp"
                             app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:padding="16dp"
+                                android:gravity="center_vertical"
                                 android:orientation="vertical"
-                                android:gravity="center_vertical">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="18dp"
@@ -505,8 +527,8 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Matahari Terbenam"
-                                    android:textSize="13sp"
-                                    android:textColor="#B3FFFFFF"/>
+                                    android:textColor="#B3FFFFFF"
+                                    android:textSize="13sp" />
 
                                 <TextView
                                     android:id="@+id/tvSunset"
@@ -514,14 +536,16 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
                                     android:text="18:22"
+                                    android:textColor="@android:color/white"
                                     android:textSize="22sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@android:color/white"/>
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
                     </GridLayout>
+
+                    <!-- TEXT ATTRIBUTION -->
                     <TextView
                         android:id="@+id/tvAttribution"
                         android:layout_width="match_parent"
@@ -529,7 +553,7 @@
                         android:layout_marginTop="24dp"
                         android:layout_marginBottom="16dp"
                         android:gravity="center"
-                        android:text="Data cuaca disediakan oleh OpenWeather"
+                        android:text="Data cuaca disediakan oleh OpenWeatherMap"
                         android:textColor="#B3FFFFFF"
                         android:textSize="12sp" />
 
