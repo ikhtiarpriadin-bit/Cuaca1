@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     // Top Navigation & Search Views
     private lateinit var ivSearch: ImageView
+    private lateinit var ivManageCities: ImageView
     private lateinit var ivSettings: ImageView
     private lateinit var searchView: SearchView
     private lateinit var nestedScrollView: NestedScrollView
@@ -102,6 +103,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Launcher untuk Menerima Hasil Kota yang Dipilih dari ManageCitiesActivity
+    private val manageCitiesLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val selectedCity = result.data?.getStringExtra("SELECTED_CITY")
+            if (!selectedCity.isNullOrEmpty()) {
+                cariKota(selectedCity)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -115,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         setupScrollFadeAnimation()
         setupCustomPullToRefresh()
         setupSearchView()
-        setupSettingsButton()
+        setupHeaderButtons()
         setupBackButtonHandler()
 
         cekAtauMintaIzinLokasi()
@@ -123,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Saat kembali dari SettingsActivity, refresh data cuaca dengan unit (metric/imperial) yang baru dipilih
+        // Saat kembali dari SettingsActivity, refresh data cuaca dengan unit (metric/imperial) yang baru
         refreshCurrentWeatherData()
     }
 
@@ -160,9 +173,10 @@ class MainActivity : AppCompatActivity() {
         tvSunrise = findViewById(R.id.tvSunrise)
         tvSunset = findViewById(R.id.tvSunset)
 
-        // Search & Settings Views
+        // Header Navigation Views
         ivSearch = findViewById(R.id.btnSearch)
-        ivSettings = findViewById(R.id.btnSettings) // Pastikan ID ini ada di XML activity_main kamu
+        ivManageCities = findViewById(R.id.btnManageCities)
+        ivSettings = findViewById(R.id.btnSettings)
         searchView = findViewById(R.id.searchView)
 
         // RecyclerViews
@@ -182,10 +196,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupSettingsButton() {
+    private fun setupHeaderButtons() {
+        // Tombol Membuka Halaman Settings
         ivSettings.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
+        }
+
+        // Tombol Membuka Halaman Kelola Kota
+        ivManageCities.setOnClickListener {
+            val intent = Intent(this, ManageCitiesActivity::class.java)
+            manageCitiesLauncher.launch(intent)
         }
     }
 
@@ -202,7 +223,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    // Helper untuk mengambil preferensi unit suhu ("metric" atau "imperial") dari SharedPreferences
     private fun getTemperatureUnit(): String {
         val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
         return sharedPref.getString("UNIT", "metric") ?: "metric"
@@ -564,6 +584,7 @@ class MainActivity : AppCompatActivity() {
         if (searchView.visibility == View.VISIBLE) return
 
         ivSearch.visibility = View.GONE
+        ivManageCities.visibility = View.GONE
         ivSettings.visibility = View.GONE
         tvLocation.visibility = View.INVISIBLE
 
@@ -601,6 +622,7 @@ class MainActivity : AppCompatActivity() {
                 searchView.translationY = 0f
 
                 ivSearch.visibility = View.VISIBLE
+                ivManageCities.visibility = View.VISIBLE
                 ivSettings.visibility = View.VISIBLE
                 tvLocation.visibility = View.VISIBLE
             }
