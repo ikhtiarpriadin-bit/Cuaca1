@@ -48,7 +48,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- ================================================================= -->
-    <!-- 3. HEADER NAVBAR (Nama Kota, Tombol Search, Manage Cities & Settings) -->
+    <!-- 3. HEADER NAVBAR (Teks Lokasi Rata Kiri & Aman Dari Icon Kanan)    -->
     <!-- ================================================================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
@@ -61,20 +61,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- Judul Lokasi Rata Kiri (Tidak menabrak tombol kanan) -->
         <TextView
             android:id="@+id/tvLocation"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:gravity="start|center_vertical"
+            android:maxLines="1"
+            android:singleLine="true"
             android:text="Mencari Lokasi..."
             android:textColor="@android:color/white"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnManageCities"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Tombol Kelola Kota (Daftar Kota Favorit) -->
+        <!-- Tombol Kelola Kota -->
         <ImageView
             android:id="@+id/btnManageCities"
             android:layout_width="28dp"
@@ -85,12 +92,12 @@
             android:contentDescription="Manage Cities"
             android:focusable="true"
             android:src="@drawable/ic_add"
-            app:layout_constraintBottom_toBottomOf="@id/tvLocation"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btnSettings"
-            app:layout_constraintTop_toTopOf="@id/tvLocation"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@android:color/white" />
 
-        <!-- Tombol Settings (Pojok Kanan Atas) -->
+        <!-- Tombol Settings -->
         <ImageView
             android:id="@+id/btnSettings"
             android:layout_width="28dp"
@@ -101,9 +108,9 @@
             android:contentDescription="Settings"
             android:focusable="true"
             android:src="@drawable/ic_set"
-            app:layout_constraintBottom_toBottomOf="@id/tvLocation"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvLocation"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@android:color/white" />
 
         <!-- SearchView Melayang Saat Pencarian Aktif -->

@@ -9,7 +9,6 @@ import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.view.MotionEvent
-import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -116,7 +115,6 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Mendeteksi lokasi GPS...", Toast.LENGTH_SHORT).show()
                     cekAtauMintaIzinLokasi()
                 } else {
-                    // Kunci state agar onResume tidak menimpa kota pilihan ini
                     isCustomCitySelected = true
                     currentCityName = selectedCity
                     cariKota(selectedCity)
@@ -145,8 +143,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // HANYA refresh jika pengguna TIDAK sedang memilih kota manual secara spesifik
-        // atau jika unit suhu (metric/imperial) di Settings diubah.
         if (!isCustomCitySelected) {
             refreshCurrentWeatherData()
         }
@@ -256,7 +252,6 @@ class MainActivity : AppCompatActivity() {
     private fun dapatkanLokasiPerangkat() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
-                // Cegah penimpaan jika pengguna sudah terlanjur memilih kota lain saat GPS baru selesai loading
                 if (isCustomCitySelected) return@addOnSuccessListener
 
                 if (location != null) {
@@ -299,8 +294,11 @@ class MainActivity : AppCompatActivity() {
 
                 if (response.isSuccessful && response.body() != null) {
                     val data = response.body()!!
+
                     updateUI(data)
                     updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
+                    forceRedrawUI()
+
                     ambilForecast(data.coord.lat, data.coord.lon)
 
                     if (wasPullRefreshing) {
@@ -330,13 +328,14 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body() != null) {
                     val data = response.body()!!
 
-                    // Kunci nama kota & koordinatnya
                     currentCityName = data.name
                     currentLat = data.coord.lat
                     currentLon = data.coord.lon
 
                     updateUI(data)
                     updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
+                    forceRedrawUI()
+
                     ambilForecast(data.coord.lat, data.coord.lon)
 
                     Toast.makeText(this@MainActivity, "Cuaca ${data.name} ditemukan", Toast.LENGTH_SHORT).show()
@@ -416,6 +415,18 @@ class MainActivity : AppCompatActivity() {
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         tvSunrise.text = timeFormat.format(Date(data.sys.sunrise * 1000))
         tvSunset.text = timeFormat.format(Date(data.sys.sunset * 1000))
+    }
+
+    private fun forceRedrawUI() {
+        nestedScrollView.scrollTo(0, 0)
+
+        tvTemperature.alpha = 1f
+        ivWeatherIcon.alpha = 1f
+        tvFeelsLike.alpha = 1f
+        tvCondition.alpha = 1f
+
+        nestedScrollView.invalidate()
+        ivBackground.invalidate()
     }
 
     private fun translateWeather(weather: String): String {
