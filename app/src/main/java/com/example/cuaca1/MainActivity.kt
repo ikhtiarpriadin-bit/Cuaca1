@@ -83,6 +83,9 @@ class MainActivity : AppCompatActivity() {
     private var currentLat: Double? = null
     private var currentLon: Double? = null
 
+    // BENDERA PENCEGAH BUG: Menandai apakah pengguna sedang melihat kota pilihan manual
+    private var isCustomCitySelected = false
+
     // Permission Handler
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -108,12 +111,14 @@ class MainActivity : AppCompatActivity() {
                 resetPullPosition()
 
                 if (selectedCity == "CURRENT_LOCATION") {
-                    // Jika pengguna memilih "Lokasi Saat Ini"
+                    isCustomCitySelected = false
                     currentCityName = null
                     Toast.makeText(this, "Mendeteksi lokasi GPS...", Toast.LENGTH_SHORT).show()
                     cekAtauMintaIzinLokasi()
                 } else {
-                    // Jika memilih nama kota tertentu
+                    // Kunci state agar onResume tidak menimpa kota pilihan ini
+                    isCustomCitySelected = true
+                    currentCityName = selectedCity
                     cariKota(selectedCity)
                 }
             }
@@ -133,11 +138,18 @@ class MainActivity : AppCompatActivity() {
         setupScrollFadeAnimation()
         setupCustomPullToRefresh()
         setupHeaderButtons()
+
+        // Pertama kali buka, minta lokasi GPS
+        cekAtauMintaIzinLokasi()
     }
 
     override fun onResume() {
         super.onResume()
-        refreshCurrentWeatherData()
+        // HANYA refresh jika pengguna TIDAK sedang memilih kota manual secara spesifik
+        // atau jika unit suhu (metric/imperial) di Settings diubah.
+        if (!isCustomCitySelected) {
+            refreshCurrentWeatherData()
+        }
     }
 
     // =========================================================================
@@ -244,13 +256,15 @@ class MainActivity : AppCompatActivity() {
     private fun dapatkanLokasiPerangkat() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
+                // Cegah penimpaan jika pengguna sudah terlanjur memilih kota lain saat GPS baru selesai loading
+                if (isCustomCitySelected) return@addOnSuccessListener
+
                 if (location != null) {
                     currentLat = location.latitude
                     currentLon = location.longitude
                     currentCityName = null
                     ambilDataCuaca(location.latitude, location.longitude)
                 } else {
-                    Toast.makeText(this, "GPS tidak aktif. Menampilkan lokasi default.", Toast.LENGTH_SHORT).show()
                     currentLat = defaultLat
                     currentLon = defaultLon
                     currentCityName = null
@@ -258,7 +272,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Gagal mendapatkan lokasi GPS.", Toast.LENGTH_SHORT).show()
+                if (isCustomCitySelected) return@addOnFailureListener
                 currentLat = defaultLat
                 currentLon = defaultLon
                 currentCityName = null
@@ -315,6 +329,8 @@ class MainActivity : AppCompatActivity() {
 
                 if (response.isSuccessful && response.body() != null) {
                     val data = response.body()!!
+
+                    // Kunci nama kota & koordinatnya
                     currentCityName = data.name
                     currentLat = data.coord.lat
                     currentLon = data.coord.lon
@@ -323,7 +339,7 @@ class MainActivity : AppCompatActivity() {
                     updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
                     ambilForecast(data.coord.lat, data.coord.lon)
 
-                    Toast.makeText(this@MainActivity, "Cuaca ${data.name} diperbarui", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "Cuaca ${data.name} ditemukan", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this@MainActivity, "Kota \"$city\" tidak ditemukan", Toast.LENGTH_SHORT).show()
                 }
