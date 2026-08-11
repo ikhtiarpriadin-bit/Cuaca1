@@ -40,9 +40,11 @@ class ManageCitiesActivity : AppCompatActivity() {
 
         initViews()
         setupRecyclerView()
-        loadSavedCities()
         setupSearchLogic()
         setupPopularChips()
+
+        // Memuat daftar kota yang tersimpan
+        loadSavedCities()
     }
 
     private fun initViews() {
@@ -61,8 +63,12 @@ class ManageCitiesActivity : AppCompatActivity() {
             onCityClick = { cityName -> selectCityAndReturn(cityName) },
             onDeleteClick = { item -> deleteCity(item) }
         )
-        rvCities.layoutManager = LinearLayoutManager(this)
-        rvCities.adapter = cityAdapter
+        // Optimasi performa RecyclerView
+        rvCities.apply {
+            layoutManager = LinearLayoutManager(this@ManageCitiesActivity)
+            adapter = cityAdapter
+            setHasFixedSize(true)
+        }
     }
 
     private fun setupSearchLogic() {
@@ -120,15 +126,20 @@ class ManageCitiesActivity : AppCompatActivity() {
         val citySet = sharedPref.getStringSet("SAVED_CITIES", setOf("Banjarmasin", "Jakarta")) ?: emptySet()
 
         savedCityList.clear()
-        for (cityName in citySet) {
-            val item = CityItem(name = cityName)
-            savedCityList.add(item)
-            fetchCityWeatherDetails(item)
+
+        // Tampilkan dulu skeleton/nama kota dengan cepat tanpa menunggu API
+        citySet.forEach { cityName ->
+            savedCityList.add(CityItem(name = cityName))
         }
         cityAdapter.notifyDataSetChanged()
+
+        // Ambil detail cuaca di background dan perbarui per baris (smooth update)
+        savedCityList.forEachIndexed { index, item ->
+            fetchCityWeatherDetails(item, index)
+        }
     }
 
-    private fun fetchCityWeatherDetails(item: CityItem) {
+    private fun fetchCityWeatherDetails(item: CityItem, position: Int) {
         RetrofitClient.api.getWeatherByCity(
             city = item.name,
             units = "metric",
@@ -140,7 +151,9 @@ class ManageCitiesActivity : AppCompatActivity() {
                     item.temp = "${data.main.temp.toInt()}°"
                     item.condition = translateWeather(data.weather.firstOrNull()?.main ?: "")
                     item.tempRange = "${data.main.tempMax.toInt()}° / ${data.main.tempMin.toInt()}°"
-                    cityAdapter.notifyDataSetChanged()
+
+                    // Hanya perbarui baris/item yang bersangkutan saja (bebas lag/patah-patah)
+                    cityAdapter.notifyItemChanged(position)
                 }
             }
 
@@ -159,13 +172,17 @@ class ManageCitiesActivity : AppCompatActivity() {
     }
 
     private fun deleteCity(item: CityItem) {
-        savedCityList.remove(item)
-        val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
-        val currentSet = savedCityList.map { it.name }.toSet()
-        sharedPref.edit().putStringSet("SAVED_CITIES", currentSet).apply()
+        val position = savedCityList.indexOf(item)
+        if (position != -1) {
+            savedCityList.removeAt(position)
+            cityAdapter.notifyItemRemoved(position)
 
-        cityAdapter.notifyDataSetChanged()
-        Toast.makeText(this, "Kota ${item.name} dihapus", Toast.LENGTH_SHORT).show()
+            val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
+            val currentSet = savedCityList.map { it.name }.toSet()
+            sharedPref.edit().putStringSet("SAVED_CITIES", currentSet).apply()
+
+            Toast.makeText(this, "Kota ${item.name} dihapus", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun selectCityAndReturn(cityName: String) {

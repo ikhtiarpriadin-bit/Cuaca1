@@ -14,7 +14,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -79,7 +78,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rvHourlyForecast: RecyclerView
     private lateinit var rvDailyForecast: RecyclerView
 
-    // Variable untuk menyimpan kota/koordinat aktif saat ini
+    // Active City / Coordinates State
     private var currentCityName: String? = null
     private var currentLat: Double? = null
     private var currentLon: Double? = null
@@ -99,13 +98,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Launcher untuk Menerima Hasil Kota yang Dipilih dari ManageCitiesActivity
+    // Launcher Result dari ManageCitiesActivity
     private val manageCitiesLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val selectedCity = result.data?.getStringExtra("SELECTED_CITY")
             if (!selectedCity.isNullOrEmpty()) {
+                resetPullPosition()
                 cariKota(selectedCity)
             }
         }
@@ -128,7 +128,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Saat kembali dari Settings/ManageCities, refresh data cuaca
         refreshCurrentWeatherData()
     }
 
@@ -137,19 +136,16 @@ class MainActivity : AppCompatActivity() {
     // =========================================================================
 
     private fun initViews() {
-        // Handle Edge-to-Edge Padding
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(0, 0, 0, systemBars.bottom)
             insets
         }
 
-        // Layout Containers
         pullContainer = findViewById(R.id.pullContainer)
         tvPullToRefresh = findViewById(R.id.tvPullToRefresh)
         nestedScrollView = findViewById(R.id.nestedScrollView)
 
-        // Main Weather Views
         ivBackground = findViewById(R.id.ivBackground)
         ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
         tvLocation = findViewById(R.id.tvLocation)
@@ -157,7 +153,6 @@ class MainActivity : AppCompatActivity() {
         tvCondition = findViewById(R.id.tvCondition)
         tvFeelsLike = findViewById(R.id.tvFeelsLike)
 
-        // Weather Details
         tvHumidity = findViewById(R.id.tvHumidity)
         tvWind = findViewById(R.id.tvWind)
         tvPressure = findViewById(R.id.tvPressure)
@@ -165,11 +160,9 @@ class MainActivity : AppCompatActivity() {
         tvSunrise = findViewById(R.id.tvSunrise)
         tvSunset = findViewById(R.id.tvSunset)
 
-        // Header Navigation Views
         ivManageCities = findViewById(R.id.btnManageCities)
         ivSettings = findViewById(R.id.btnSettings)
 
-        // RecyclerViews
         rvHourlyForecast = findViewById(R.id.rvHourlyForecast)
         rvDailyForecast = findViewById(R.id.rvDailyForecast)
     }
@@ -187,13 +180,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupHeaderButtons() {
-        // Tombol Membuka Halaman Settings
         ivSettings.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
-        // Tombol Membuka Halaman Kelola Kota
         ivManageCities.setOnClickListener {
             val intent = Intent(this, ManageCitiesActivity::class.java)
             manageCitiesLauncher.launch(intent)
@@ -311,6 +302,8 @@ class MainActivity : AppCompatActivity() {
             apiKey = apiKey
         ).enqueue(object : Callback<WeatherResponse> {
             override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
+                resetPullPosition()
+
                 if (response.isSuccessful && response.body() != null) {
                     val data = response.body()!!
                     currentCityName = data.name
@@ -321,13 +314,14 @@ class MainActivity : AppCompatActivity() {
                     updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
                     ambilForecast(data.coord.lat, data.coord.lon)
 
-                    Toast.makeText(this@MainActivity, "Cuaca ${data.name} ditemukan", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "Cuaca ${data.name} diperbarui", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this@MainActivity, "Kota \"$city\" tidak ditemukan", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+                resetPullPosition()
                 Toast.makeText(this@MainActivity, "Gagal terhubung ke server", Toast.LENGTH_SHORT).show()
             }
         })
@@ -346,10 +340,8 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body() != null) {
                     val fullList = response.body()!!.list
 
-                    // Forecast 24 Jam (8 Data Pertama)
                     rvHourlyForecast.adapter = HourlyAdapter(fullList.take(8))
 
-                    // Forecast Harian (Pengelompokan per Hari)
                     val groupedByDate = fullList.groupBy { it.dtTxt.substring(0, 10) }
                     val dailyList = mutableListOf<ForecastItem>()
 
