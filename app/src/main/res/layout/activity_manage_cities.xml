@@ -17,8 +17,9 @@
         android:paddingTop="36dp"
         android:paddingBottom="40dp">
 
-        <!-- Header Judul -->
+        <!-- ==================== HEADER DAN SEARCH ==================== -->
         <TextView
+            android:id="@+id/tvManageTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
@@ -27,61 +28,136 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
-        <!-- Card Input Tambah Kota Baru -->
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardBackgroundColor="#26FFFFFF"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <LinearLayout
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchViewCity"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_search"
+                app:iconifiedByDefault="false"
+                app:queryBackground="@null"
+                app:queryHint="Masukkan lokasi..." />
+
+            <TextView
+                android:id="@+id/btnCancelSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:padding="8dp"
+                android:text="Batal"
+                android:textColor="#3897F0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- ==================== MODE PENCARIAN (KOTA POPULER) ==================== -->
+        <LinearLayout
+            android:id="@+id/layoutPopularCities"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Kota Populer"
+                android:textColor="#AAAAAA"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupPopular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="8dp">
 
-                <EditText
-                    android:id="@+id/etNewCity"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:hint="Masukkan nama kota baru..."
-                    android:inputType="textCapWords"
-                    android:paddingHorizontal="12dp"
-                    android:textColor="@android:color/white"
-                    android:textColorHint="#888888"
-                    android:textSize="15sp" />
-
-                <Button
-                    android:id="@+id/btnAddCity"
+                <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tambah"
-                    android:textSize="13sp" />
+                    android:text="Jakarta"
+                    app:chipBackgroundColor="#26FFFFFF"
+                    app:chipCornerRadius="12dp"
+                    android:textColor="@android:color/white"/>
 
-            </LinearLayout>
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Surabaya"
+                    app:chipBackgroundColor="#26FFFFFF"
+                    app:chipCornerRadius="12dp"
+                    android:textColor="@android:color/white"/>
 
-        </androidx.cardview.widget.CardView>
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bandung"
+                    app:chipBackgroundColor="#26FFFFFF"
+                    app:chipCornerRadius="12dp"
+                    android:textColor="@android:color/white"/>
 
-        <!-- Daftar Kota Favorit -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="DAFTAR KOTA TERSIMPAN"
-            android:textColor="#AAAAAA"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Yogyakarta"
+                    app:chipBackgroundColor="#26FFFFFF"
+                    app:chipCornerRadius="12dp"
+                    android:textColor="@android:color/white"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvCities"
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Singapore"
+                    app:chipBackgroundColor="#26FFFFFF"
+                    app:chipCornerRadius="12dp"
+                    android:textColor="@android:color/white"/>
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tokyo"
+                    app:chipBackgroundColor="#26FFFFFF"
+                    app:chipCornerRadius="12dp"
+                    android:textColor="@android:color/white"/>
+
+            </com.google.android.material.chip.ChipGroup>
+
+        </LinearLayout>
+
+        <!-- ==================== MODE DAFTAR KOTA TERSIMPAN ==================== -->
+        <LinearLayout
+            android:id="@+id/layoutSavedCities"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/item_city" />
+            android:layout_marginTop="24dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Lokasi Tersimpan"
+                android:textColor="#AAAAAA"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCities"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/item_city" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

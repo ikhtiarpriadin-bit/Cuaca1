@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/weather"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        android:theme="@style/Theme.Cuaca1">
         <activity
             android:name=".MainActivity"
             android:exported="true"

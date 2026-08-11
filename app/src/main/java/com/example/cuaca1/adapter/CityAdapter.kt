@@ -7,15 +7,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cuaca1.R
+import com.example.cuaca1.model.CityItem
 
 class CityAdapter(
-    private val cityList: MutableList<String>,
+    private val cityList: MutableList<CityItem>,
     private val onCityClick: (String) -> Unit,
-    private val onDeleteClick: (String) -> Unit
+    private val onDeleteClick: (CityItem) -> Unit
 ) : RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
 
     class CityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvCityName: TextView = itemView.findViewById(R.id.tvCityName)
+        val tvCityCondition: TextView = itemView.findViewById(R.id.tvCityCondition)
+        val tvCityTemp: TextView = itemView.findViewById(R.id.tvCityTemp)
+        val tvCityTempRange: TextView = itemView.findViewById(R.id.tvCityTempRange)
         val btnDeleteCity: ImageView = itemView.findViewById(R.id.btnDeleteCity)
     }
 
@@ -25,18 +29,14 @@ class CityAdapter(
     }
 
     override fun onBindViewHolder(holder: CityViewHolder, position: Int) {
-        val cityName = cityList[position]
-        holder.tvCityName.text = cityName
+        val item = cityList[position]
+        holder.tvCityName.text = item.name
+        holder.tvCityCondition.text = item.condition
+        holder.tvCityTemp.text = item.temp
+        holder.tvCityTempRange.text = item.tempRange
 
-        // Saat item kota diklik (pilih kota)
-        holder.itemView.setOnClickListener {
-            onCityClick(cityName)
-        }
-
-        // Saat tombol hapus diklik
-        holder.btnDeleteCity.setOnClickListener {
-            onDeleteClick(cityName)
-        }
+        holder.itemView.setOnClickListener { onCityClick(item.name) }
+        holder.btnDeleteCity.setOnClickListener { onDeleteClick(item) }
     }
 
     override fun getItemCount(): Int = cityList.size

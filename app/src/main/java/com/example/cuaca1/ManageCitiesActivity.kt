@@ -3,97 +3,188 @@ package com.example.cuaca1
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cuaca1.adapter.CityAdapter
+import com.example.cuaca1.api.RetrofitClient
+import com.example.cuaca1.model.CityItem
+import com.example.cuaca1.model.WeatherResponse
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ManageCitiesActivity : AppCompatActivity() {
 
-    private lateinit var etNewCity: EditText
-    private lateinit var btnAddCity: Button
+    private lateinit var tvManageTitle: TextView
+    private lateinit var searchViewCity: SearchView
+    private lateinit var btnCancelSearch: TextView
+    private lateinit var layoutPopularCities: View
+    private lateinit var layoutSavedCities: View
+    private lateinit var chipGroupPopular: ChipGroup
     private lateinit var rvCities: RecyclerView
 
-    private val savedCities = mutableListOf<String>()
+    private val savedCityList = mutableListOf<CityItem>()
     private lateinit var cityAdapter: CityAdapter
+    private val apiKey = "277e22a7fbc5477aedc466d91c974316"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manage_cities)
 
         initViews()
-        loadSavedCities()
         setupRecyclerView()
-
-        btnAddCity.setOnClickListener {
-            val newCity = etNewCity.text.toString().trim()
-            if (newCity.isNotEmpty()) {
-                addCity(newCity)
-            } else {
-                Toast.makeText(this, "Nama kota tidak boleh kosong", Toast.LENGTH_SHORT).show()
-            }
-        }
+        loadSavedCities()
+        setupSearchLogic()
+        setupPopularChips()
     }
 
     private fun initViews() {
-        etNewCity = findViewById(R.id.etNewCity)
-        btnAddCity = findViewById(R.id.btnAddCity)
+        tvManageTitle = findViewById(R.id.tvManageTitle)
+        searchViewCity = findViewById(R.id.searchViewCity)
+        btnCancelSearch = findViewById(R.id.btnCancelSearch)
+        layoutPopularCities = findViewById(R.id.layoutPopularCities)
+        layoutSavedCities = findViewById(R.id.layoutSavedCities)
+        chipGroupPopular = findViewById(R.id.chipGroupPopular)
         rvCities = findViewById(R.id.rvCities)
-    }
-
-    private fun loadSavedCities() {
-        val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
-        val citySet = sharedPref.getStringSet("SAVED_CITIES", emptySet()) ?: emptySet()
-
-        savedCities.clear()
-        savedCities.addAll(citySet)
-    }
-
-    private fun saveCitiesToPref() {
-        val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
-        sharedPref.edit().putStringSet("SAVED_CITIES", savedCities.toSet()).apply()
     }
 
     private fun setupRecyclerView() {
         cityAdapter = CityAdapter(
-            cityList = savedCities,
-            onCityClick = { selectedCity ->
-                // Kirim balik nama kota yang dipilih ke MainActivity
-                val resultIntent = Intent().apply {
-                    putExtra("SELECTED_CITY", selectedCity)
-                }
-                setResult(RESULT_OK, resultIntent)
-                finish() // Tutup halaman ini
-            },
-            onDeleteClick = { cityToDelete ->
-                deleteCity(cityToDelete)
-            }
+            cityList = savedCityList,
+            onCityClick = { cityName -> selectCityAndReturn(cityName) },
+            onDeleteClick = { item -> deleteCity(item) }
         )
-
         rvCities.layoutManager = LinearLayoutManager(this)
         rvCities.adapter = cityAdapter
     }
 
-    private fun addCity(cityName: String) {
-        if (savedCities.any { it.equals(cityName, ignoreCase = true) }) {
-            Toast.makeText(this, "Kota sudah ada di daftar", Toast.LENGTH_SHORT).show()
-            return
+    private fun setupSearchLogic() {
+        searchViewCity.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            showSearchMode(hasFocus)
         }
 
-        savedCities.add(cityName)
-        saveCitiesToPref()
-        cityAdapter.notifyDataSetChanged()
-        etNewCity.text.clear()
-        Toast.makeText(this, "Kota $cityName ditambahkan", Toast.LENGTH_SHORT).show()
+        searchViewCity.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (!query.isNullOrBlank()) {
+                    addAndSelectCity(query.trim())
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean = false
+        })
+
+        btnCancelSearch.setOnClickListener {
+            searchViewCity.setQuery("", false)
+            searchViewCity.clearFocus()
+            showSearchMode(false)
+        }
     }
 
-    private fun deleteCity(cityName: String) {
-        savedCities.remove(cityName)
-        saveCitiesToPref()
+    private fun setupPopularChips() {
+        try {
+            for (i in 0 until chipGroupPopular.childCount) {
+                val chip = chipGroupPopular.getChildAt(i) as? Chip
+                chip?.setOnClickListener {
+                    addAndSelectCity(chip.text.toString())
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun showSearchMode(isSearch: Boolean) {
+        if (isSearch) {
+            tvManageTitle.visibility = View.GONE
+            btnCancelSearch.visibility = View.VISIBLE
+            layoutPopularCities.visibility = View.VISIBLE
+            layoutSavedCities.visibility = View.GONE
+        } else {
+            tvManageTitle.visibility = View.VISIBLE
+            btnCancelSearch.visibility = View.GONE
+            layoutPopularCities.visibility = View.GONE
+            layoutSavedCities.visibility = View.VISIBLE
+        }
+    }
+
+    private fun loadSavedCities() {
+        val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
+        val citySet = sharedPref.getStringSet("SAVED_CITIES", setOf("Banjarmasin", "Jakarta")) ?: emptySet()
+
+        savedCityList.clear()
+        for (cityName in citySet) {
+            val item = CityItem(name = cityName)
+            savedCityList.add(item)
+            fetchCityWeatherDetails(item)
+        }
         cityAdapter.notifyDataSetChanged()
-        Toast.makeText(this, "Kota $cityName dihapus", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun fetchCityWeatherDetails(item: CityItem) {
+        RetrofitClient.api.getWeatherByCity(
+            city = item.name,
+            units = "metric",
+            apiKey = apiKey
+        ).enqueue(object : Callback<WeatherResponse> {
+            override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
+                if (response.isSuccessful && response.body() != null) {
+                    val data = response.body()!!
+                    item.temp = "${data.main.temp.toInt()}°"
+                    item.condition = translateWeather(data.weather.firstOrNull()?.main ?: "")
+                    item.tempRange = "${data.main.tempMax.toInt()}° / ${data.main.tempMin.toInt()}°"
+                    cityAdapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {}
+        })
+    }
+
+    private fun addAndSelectCity(cityName: String) {
+        val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
+        val currentSet = sharedPref.getStringSet("SAVED_CITIES", emptySet())?.toMutableSet() ?: mutableSetOf()
+
+        currentSet.add(cityName)
+        sharedPref.edit().putStringSet("SAVED_CITIES", currentSet).apply()
+
+        selectCityAndReturn(cityName)
+    }
+
+    private fun deleteCity(item: CityItem) {
+        savedCityList.remove(item)
+        val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
+        val currentSet = savedCityList.map { it.name }.toSet()
+        sharedPref.edit().putStringSet("SAVED_CITIES", currentSet).apply()
+
+        cityAdapter.notifyDataSetChanged()
+        Toast.makeText(this, "Kota ${item.name} dihapus", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun selectCityAndReturn(cityName: String) {
+        val resultIntent = Intent().apply {
+            putExtra("SELECTED_CITY", cityName)
+        }
+        setResult(RESULT_OK, resultIntent)
+        finish()
+    }
+
+    private fun translateWeather(weather: String): String {
+        return when (weather) {
+            "Clear" -> "Cerah"
+            "Clouds" -> "Berawan"
+            "Rain" -> "Hujan"
+            "Thunderstorm" -> "Badai Petir"
+            "Drizzle" -> "Gerimis"
+            "Mist", "Fog", "Haze" -> "Berkabut"
+            else -> weather
+        }
     }
 }

@@ -74,22 +74,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Tombol Cari Kota -->
-        <ImageView
-            android:id="@+id/btnSearch"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginEnd="12dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="Search"
-            android:focusable="true"
-            android:src="@drawable/ic_search"
-            app:layout_constraintBottom_toBottomOf="@id/tvLocation"
-            app:layout_constraintEnd_toStartOf="@id/btnManageCities"
-            app:layout_constraintTop_toTopOf="@id/tvLocation"
-            app:tint="@android:color/white" />
-
         <!-- Tombol Kelola Kota (Daftar Kota Favorit) -->
         <ImageView
             android:id="@+id/btnManageCities"
@@ -100,7 +84,7 @@
             android:clickable="true"
             android:contentDescription="Manage Cities"
             android:focusable="true"
-            android:src="@android:drawable/ic_menu_add"
+            android:src="@drawable/ic_add"
             app:layout_constraintBottom_toBottomOf="@id/tvLocation"
             app:layout_constraintEnd_toStartOf="@id/btnSettings"
             app:layout_constraintTop_toTopOf="@id/tvLocation"

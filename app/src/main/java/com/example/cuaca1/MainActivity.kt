@@ -10,7 +10,6 @@ import android.location.Location
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -19,7 +18,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -67,11 +65,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvSunrise: TextView
     private lateinit var tvSunset: TextView
 
-    // Top Navigation & Search Views
-    private lateinit var ivSearch: ImageView
+    // Top Navigation Views
     private lateinit var ivManageCities: ImageView
     private lateinit var ivSettings: ImageView
-    private lateinit var searchView: SearchView
     private lateinit var nestedScrollView: NestedScrollView
 
     // Custom Pull-to-Refresh Views
@@ -127,16 +123,12 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerViews()
         setupScrollFadeAnimation()
         setupCustomPullToRefresh()
-        setupSearchView()
         setupHeaderButtons()
-        setupBackButtonHandler()
-
-        cekAtauMintaIzinLokasi()
     }
 
     override fun onResume() {
         super.onResume()
-        // Saat kembali dari SettingsActivity, refresh data cuaca dengan unit (metric/imperial) yang baru
+        // Saat kembali dari Settings/ManageCities, refresh data cuaca
         refreshCurrentWeatherData()
     }
 
@@ -174,10 +166,8 @@ class MainActivity : AppCompatActivity() {
         tvSunset = findViewById(R.id.tvSunset)
 
         // Header Navigation Views
-        ivSearch = findViewById(R.id.btnSearch)
         ivManageCities = findViewById(R.id.btnManageCities)
         ivSettings = findViewById(R.id.btnSettings)
-        searchView = findViewById(R.id.searchView)
 
         // RecyclerViews
         rvHourlyForecast = findViewById(R.id.rvHourlyForecast)
@@ -210,19 +200,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupBackButtonHandler() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (searchView.visibility == View.VISIBLE) {
-                    closeSearch()
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                }
-            }
-        })
-    }
-
     private fun getTemperatureUnit(): String {
         val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
         return sharedPref.getString("UNIT", "metric") ?: "metric"
@@ -233,6 +210,8 @@ class MainActivity : AppCompatActivity() {
             cariKota(currentCityName!!)
         } else if (currentLat != null && currentLon != null) {
             ambilDataCuaca(currentLat!!, currentLon!!)
+        } else {
+            cekAtauMintaIzinLokasi()
         }
     }
 
@@ -341,7 +320,6 @@ class MainActivity : AppCompatActivity() {
                     updateUI(data)
                     updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
                     ambilForecast(data.coord.lat, data.coord.lon)
-                    closeSearch()
 
                     Toast.makeText(this@MainActivity, "Cuaca ${data.name} ditemukan", Toast.LENGTH_SHORT).show()
                 } else {
@@ -523,7 +501,7 @@ class MainActivity : AppCompatActivity() {
                             isRefreshing = true
                             tvPullToRefresh.text = "Memperbarui data..."
                             pullContainer.animate().translationY(100f).setDuration(250).start()
-                            dapatkanLokasiPerangkat()
+                            refreshCurrentWeatherData()
                         } else {
                             resetPullPosition()
                         }
@@ -551,81 +529,5 @@ class MainActivity : AppCompatActivity() {
 
             tvCondition.alpha = 1f - (scrollY / 320f).coerceIn(0f, 1f)
         })
-    }
-
-    // =========================================================================
-    // 6. SEARCH BAR UI LOGIC
-    // =========================================================================
-
-    private fun setupSearchView() {
-        searchView.queryHint = "Cari kota..."
-        searchView.visibility = View.GONE
-
-        ivSearch.setOnClickListener { openSearch() }
-        searchView.setOnCloseListener {
-            closeSearch()
-            true
-        }
-
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                if (!query.isNullOrBlank()) {
-                    cariKota(query.trim())
-                }
-                searchView.clearFocus()
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean = false
-        })
-    }
-
-    private fun openSearch() {
-        if (searchView.visibility == View.VISIBLE) return
-
-        ivSearch.visibility = View.GONE
-        ivManageCities.visibility = View.GONE
-        ivSettings.visibility = View.GONE
-        tvLocation.visibility = View.INVISIBLE
-
-        searchView.visibility = View.VISIBLE
-        searchView.alpha = 0f
-        searchView.translationY = -20f
-        searchView.isIconified = false
-        searchView.requestFocus()
-
-        searchView.post {
-            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT)
-        }
-
-        searchView.animate().alpha(1f).translationY(0f).setDuration(220).start()
-    }
-
-    private fun closeSearch() {
-        if (searchView.visibility == View.GONE) return
-
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(currentFocus?.windowToken ?: searchView.windowToken, 0)
-
-        searchView.clearFocus()
-        searchView.isIconified = true
-
-        searchView.animate()
-            .alpha(0f)
-            .translationY(-10f)
-            .setDuration(220)
-            .withEndAction {
-                searchView.setQuery("", false)
-                searchView.visibility = View.GONE
-                searchView.alpha = 1f
-                searchView.translationY = 0f
-
-                ivSearch.visibility = View.VISIBLE
-                ivManageCities.visibility = View.VISIBLE
-                ivSettings.visibility = View.VISIBLE
-                tvLocation.visibility = View.VISIBLE
-            }
-            .start()
     }
 }
