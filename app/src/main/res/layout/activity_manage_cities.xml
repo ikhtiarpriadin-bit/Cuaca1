@@ -87,49 +87,49 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Jakarta"
+                    android:textColor="@android:color/white"
                     app:chipBackgroundColor="#26FFFFFF"
-                    app:chipCornerRadius="12dp"
-                    android:textColor="@android:color/white"/>
+                    app:chipCornerRadius="12dp" />
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Surabaya"
+                    android:textColor="@android:color/white"
                     app:chipBackgroundColor="#26FFFFFF"
-                    app:chipCornerRadius="12dp"
-                    android:textColor="@android:color/white"/>
+                    app:chipCornerRadius="12dp" />
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Bandung"
+                    android:textColor="@android:color/white"
                     app:chipBackgroundColor="#26FFFFFF"
-                    app:chipCornerRadius="12dp"
-                    android:textColor="@android:color/white"/>
+                    app:chipCornerRadius="12dp" />
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Yogyakarta"
+                    android:textColor="@android:color/white"
                     app:chipBackgroundColor="#26FFFFFF"
-                    app:chipCornerRadius="12dp"
-                    android:textColor="@android:color/white"/>
+                    app:chipCornerRadius="12dp" />
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Singapore"
+                    android:textColor="@android:color/white"
                     app:chipBackgroundColor="#26FFFFFF"
-                    app:chipCornerRadius="12dp"
-                    android:textColor="@android:color/white"/>
+                    app:chipCornerRadius="12dp" />
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Tokyo"
+                    android:textColor="@android:color/white"
                     app:chipBackgroundColor="#26FFFFFF"
-                    app:chipCornerRadius="12dp"
-                    android:textColor="@android:color/white"/>
+                    app:chipCornerRadius="12dp" />
 
             </com.google.android.material.chip.ChipGroup>
 
@@ -151,6 +151,50 @@
                 android:textColor="#AAAAAA"
                 android:textSize="13sp"
                 android:textStyle="bold" />
+
+            <!-- Pilihan Lokasi Saat Ini (GPS) -->
+            <LinearLayout
+                android:id="@+id/btnSelectCurrentLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_search"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_mylocation"
+                    app:tint="#3897F0" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lokasi Saat Ini"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Gunakan posisi GPS perangkat"
+                        android:textColor="#AAAAAA"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvCities"

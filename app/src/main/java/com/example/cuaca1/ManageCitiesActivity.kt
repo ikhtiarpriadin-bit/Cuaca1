@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +30,7 @@ class ManageCitiesActivity : AppCompatActivity() {
     private lateinit var layoutSavedCities: View
     private lateinit var chipGroupPopular: ChipGroup
     private lateinit var rvCities: RecyclerView
+    private lateinit var btnSelectCurrentLocation: LinearLayout
 
     private val savedCityList = mutableListOf<CityItem>()
     private lateinit var cityAdapter: CityAdapter
@@ -42,8 +44,8 @@ class ManageCitiesActivity : AppCompatActivity() {
         setupRecyclerView()
         setupSearchLogic()
         setupPopularChips()
+        setupCurrentLocationButton()
 
-        // Memuat daftar kota yang tersimpan
         loadSavedCities()
     }
 
@@ -55,6 +57,13 @@ class ManageCitiesActivity : AppCompatActivity() {
         layoutSavedCities = findViewById(R.id.layoutSavedCities)
         chipGroupPopular = findViewById(R.id.chipGroupPopular)
         rvCities = findViewById(R.id.rvCities)
+        btnSelectCurrentLocation = findViewById(R.id.btnSelectCurrentLocation)
+    }
+
+    private fun setupCurrentLocationButton() {
+        btnSelectCurrentLocation.setOnClickListener {
+            selectCityAndReturn("CURRENT_LOCATION")
+        }
     }
 
     private fun setupRecyclerView() {
@@ -63,7 +72,6 @@ class ManageCitiesActivity : AppCompatActivity() {
             onCityClick = { cityName -> selectCityAndReturn(cityName) },
             onDeleteClick = { item -> deleteCity(item) }
         )
-        // Optimasi performa RecyclerView
         rvCities.apply {
             layoutManager = LinearLayoutManager(this@ManageCitiesActivity)
             adapter = cityAdapter
@@ -126,14 +134,11 @@ class ManageCitiesActivity : AppCompatActivity() {
         val citySet = sharedPref.getStringSet("SAVED_CITIES", setOf("Banjarmasin", "Jakarta")) ?: emptySet()
 
         savedCityList.clear()
-
-        // Tampilkan dulu skeleton/nama kota dengan cepat tanpa menunggu API
         citySet.forEach { cityName ->
             savedCityList.add(CityItem(name = cityName))
         }
         cityAdapter.notifyDataSetChanged()
 
-        // Ambil detail cuaca di background dan perbarui per baris (smooth update)
         savedCityList.forEachIndexed { index, item ->
             fetchCityWeatherDetails(item, index)
         }
@@ -152,7 +157,6 @@ class ManageCitiesActivity : AppCompatActivity() {
                     item.condition = translateWeather(data.weather.firstOrNull()?.main ?: "")
                     item.tempRange = "${data.main.tempMax.toInt()}° / ${data.main.tempMin.toInt()}°"
 
-                    // Hanya perbarui baris/item yang bersangkutan saja (bebas lag/patah-patah)
                     cityAdapter.notifyItemChanged(position)
                 }
             }

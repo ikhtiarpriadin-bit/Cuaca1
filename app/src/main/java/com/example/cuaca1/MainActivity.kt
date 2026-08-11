@@ -106,7 +106,16 @@ class MainActivity : AppCompatActivity() {
             val selectedCity = result.data?.getStringExtra("SELECTED_CITY")
             if (!selectedCity.isNullOrEmpty()) {
                 resetPullPosition()
-                cariKota(selectedCity)
+
+                if (selectedCity == "CURRENT_LOCATION") {
+                    // Jika pengguna memilih "Lokasi Saat Ini"
+                    currentCityName = null
+                    Toast.makeText(this, "Mendeteksi lokasi GPS...", Toast.LENGTH_SHORT).show()
+                    cekAtauMintaIzinLokasi()
+                } else {
+                    // Jika memilih nama kota tertentu
+                    cariKota(selectedCity)
+                }
             }
         }
     }
