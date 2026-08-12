@@ -20,6 +20,7 @@ import com.google.android.material.chip.ChipGroup
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Locale
 
 class ManageCitiesActivity : AppCompatActivity() {
 
@@ -135,7 +136,7 @@ class ManageCitiesActivity : AppCompatActivity() {
 
         savedCityList.clear()
         citySet.forEach { cityName ->
-            savedCityList.add(CityItem(name = cityName))
+            savedCityList.add(CityItem(name = cityName.toTitleCase()))
         }
         cityAdapter.notifyDataSetChanged()
 
@@ -153,9 +154,15 @@ class ManageCitiesActivity : AppCompatActivity() {
             override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     val data = response.body()!!
+
+                    // Gunakan nama resmi dari API agar ejaan & huruf kapital selalu sempurna
+                    item.name = data.name
                     item.temp = "${data.main.temp.toInt()}°"
                     item.condition = translateWeather(data.weather.firstOrNull()?.main ?: "")
                     item.tempRange = "${data.main.tempMax.toInt()}° / ${data.main.tempMin.toInt()}°"
+
+                    // Simpan kode ikon cuaca untuk background kartu dinamis
+                    item.iconCode = data.weather.firstOrNull()?.icon ?: "01d"
 
                     cityAdapter.notifyItemChanged(position)
                 }
@@ -165,14 +172,16 @@ class ManageCitiesActivity : AppCompatActivity() {
         })
     }
 
-    private fun addAndSelectCity(cityName: String) {
+    private fun addAndSelectCity(rawCityName: String) {
+        val formattedCity = rawCityName.trim().toTitleCase()
+
         val sharedPref = getSharedPreferences("WeatherPref", Context.MODE_PRIVATE)
         val currentSet = sharedPref.getStringSet("SAVED_CITIES", emptySet())?.toMutableSet() ?: mutableSetOf()
 
-        currentSet.add(cityName)
+        currentSet.add(formattedCity)
         sharedPref.edit().putStringSet("SAVED_CITIES", currentSet).apply()
 
-        selectCityAndReturn(cityName)
+        selectCityAndReturn(formattedCity)
     }
 
     private fun deleteCity(item: CityItem) {
@@ -191,7 +200,7 @@ class ManageCitiesActivity : AppCompatActivity() {
 
     private fun selectCityAndReturn(cityName: String) {
         val resultIntent = Intent().apply {
-            putExtra("SELECTED_CITY", cityName)
+            putExtra("SELECTED_CITY", cityName.toTitleCase())
         }
         setResult(RESULT_OK, resultIntent)
         finish()
@@ -206,6 +215,15 @@ class ManageCitiesActivity : AppCompatActivity() {
             "Drizzle" -> "Gerimis"
             "Mist", "Fog", "Haze" -> "Berkabut"
             else -> weather
+        }
+    }
+
+    // function untuk mengubah "new york" menjadi "New York"
+    private fun String.toTitleCase(): String {
+        if (this.isBlank()) return this
+        return this.split(" ").joinToString(" ") { word ->
+            word.lowercase(Locale.getDefault())
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         }
     }
 }
