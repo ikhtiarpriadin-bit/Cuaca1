@@ -8,11 +8,13 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -55,6 +57,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvCondition: TextView
     private lateinit var tvFeelsLike: TextView
 
+    // Status Banner Components (Di bawah Nama Lokasi)
+    private lateinit var layoutStatus: LinearLayout
+    private lateinit var ivStatusIcon: ImageView
+    private lateinit var tvStatusText: TextView
+
     // Detail Views
     private lateinit var tvHumidity: TextView
     private lateinit var tvWind: TextView
@@ -68,9 +75,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var ivSettings: ImageView
     private lateinit var nestedScrollView: NestedScrollView
 
-    // Custom Pull-to-Refresh Views
+    // Custom Pull Container
     private lateinit var pullContainer: LinearLayout
-    private lateinit var tvPullToRefresh: TextView
     private var isRefreshing = false
 
     // RecyclerViews
@@ -82,7 +88,7 @@ class MainActivity : AppCompatActivity() {
     private var currentLat: Double? = null
     private var currentLon: Double? = null
 
-    // BENDERA PENCEGAH BUG: Menandai apakah pengguna sedang melihat kota pilihan manual
+    // BENDERA PENCEGAH BUG
     private var isCustomCitySelected = false
 
     // Permission Handler
@@ -95,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         if (isGranted) {
             dapatkanLokasiPerangkat()
         } else {
-            Toast.makeText(this, "Izin lokasi ditolak. Menampilkan lokasi default.", Toast.LENGTH_SHORT).show()
+            showStatusBanner(isLoading = false, isSuccess = false, message = "Izin lokasi ditolak, memakai lokasi default")
             ambilDataCuaca(defaultLat, defaultLon)
         }
     }
@@ -112,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                 if (selectedCity == "CURRENT_LOCATION") {
                     isCustomCitySelected = false
                     currentCityName = null
-                    Toast.makeText(this, "Mendeteksi lokasi GPS...", Toast.LENGTH_SHORT).show()
+                    showStatusBanner(isLoading = true, isSuccess = false, message = "Mendeteksi lokasi GPS...")
                     cekAtauMintaIzinLokasi()
                 } else {
                     isCustomCitySelected = true
@@ -160,7 +166,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         pullContainer = findViewById(R.id.pullContainer)
-        tvPullToRefresh = findViewById(R.id.tvPullToRefresh)
         nestedScrollView = findViewById(R.id.nestedScrollView)
 
         ivBackground = findViewById(R.id.ivBackground)
@@ -169,6 +174,11 @@ class MainActivity : AppCompatActivity() {
         tvTemperature = findViewById(R.id.tvTemperature)
         tvCondition = findViewById(R.id.tvCondition)
         tvFeelsLike = findViewById(R.id.tvFeelsLike)
+
+        // Status Banner Views
+        layoutStatus = findViewById(R.id.layoutStatus)
+        ivStatusIcon = findViewById(R.id.ivStatusIcon)
+        tvStatusText = findViewById(R.id.tvStatusText)
 
         tvHumidity = findViewById(R.id.tvHumidity)
         tvWind = findViewById(R.id.tvWind)
@@ -281,6 +291,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun ambilDataCuaca(latitude: Double, longitude: Double) {
         val unit = getTemperatureUnit()
+        showStatusBanner(isLoading = true, isSuccess = false, message = "Memperbarui...")
 
         RetrofitClient.api.getWeather(
             lat = latitude,
@@ -289,7 +300,6 @@ class MainActivity : AppCompatActivity() {
             apiKey = apiKey
         ).enqueue(object : Callback<WeatherResponse> {
             override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
-                val wasPullRefreshing = isRefreshing
                 resetPullPosition()
 
                 if (response.isSuccessful && response.body() != null) {
@@ -301,21 +311,22 @@ class MainActivity : AppCompatActivity() {
 
                     ambilForecast(data.coord.lat, data.coord.lon)
 
-                    if (wasPullRefreshing) {
-                        Toast.makeText(this@MainActivity, "Data cuaca ${data.name} diperbarui", Toast.LENGTH_SHORT).show()
-                    }
+                    showStatusBanner(isLoading = false, isSuccess = true, message = "Berhasil diperbarui")
+                } else {
+                    showStatusBanner(isLoading = false, isSuccess = false, message = "Gagal memuat data")
                 }
             }
 
             override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
                 resetPullPosition()
-                Toast.makeText(this@MainActivity, "Gagal memperbarui data cuaca", Toast.LENGTH_SHORT).show()
+                showStatusBanner(isLoading = false, isSuccess = false, message = "Koneksi terputus")
             }
         })
     }
 
     private fun cariKota(city: String) {
         val unit = getTemperatureUnit()
+        showStatusBanner(isLoading = true, isSuccess = false, message = "Memperbarui...")
 
         RetrofitClient.api.getWeatherByCity(
             city = city,
@@ -338,15 +349,15 @@ class MainActivity : AppCompatActivity() {
 
                     ambilForecast(data.coord.lat, data.coord.lon)
 
-                    Toast.makeText(this@MainActivity, "Cuaca ${data.name} ditemukan", Toast.LENGTH_SHORT).show()
+                    showStatusBanner(isLoading = false, isSuccess = true, message = "Berhasil diperbarui")
                 } else {
-                    Toast.makeText(this@MainActivity, "Kota \"$city\" tidak ditemukan", Toast.LENGTH_SHORT).show()
+                    showStatusBanner(isLoading = false, isSuccess = false, message = "Kota \"$city\" tidak ditemukan")
                 }
             }
 
             override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
                 resetPullPosition()
-                Toast.makeText(this@MainActivity, "Gagal terhubung ke server", Toast.LENGTH_SHORT).show()
+                showStatusBanner(isLoading = false, isSuccess = false, message = "Gagal terhubung ke server")
             }
         })
     }
@@ -395,7 +406,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // =========================================================================
-    // 4. UI UPDATE & BINDING
+    // 4. UI UPDATE & HELPER BANNER
     // =========================================================================
 
     private fun updateUI(data: WeatherResponse) {
@@ -415,6 +426,32 @@ class MainActivity : AppCompatActivity() {
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         tvSunrise.text = timeFormat.format(Date(data.sys.sunrise * 1000))
         tvSunset.text = timeFormat.format(Date(data.sys.sunset * 1000))
+    }
+
+    private fun showStatusBanner(isLoading: Boolean, isSuccess: Boolean = false, message: String) {
+        if (!::layoutStatus.isInitialized) return
+
+        layoutStatus.visibility = View.VISIBLE
+        layoutStatus.alpha = 1f
+        tvStatusText.text = message
+
+        when {
+            isLoading -> {
+                ivStatusIcon.setImageResource(android.R.drawable.ic_popup_sync)
+            }
+            isSuccess -> {
+                ivStatusIcon.setImageResource(R.drawable.ic_check)
+
+                // Setelah 2 detik sukses, kembalikan status teks ke "Baru saja diperbarui"
+                Handler(Looper.getMainLooper()).postDelayed({
+                    ivStatusIcon.setImageResource(android.R.drawable.ic_popup_sync)
+                    tvStatusText.text = "Baru saja diperbarui"
+                }, 2000)
+            }
+            else -> {
+                ivStatusIcon.setImageResource(android.R.drawable.stat_notify_error)
+            }
+        }
     }
 
     private fun forceRedrawUI() {
@@ -479,7 +516,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // =========================================================================
-    // 5. ANIMATIONS & TOUCH INTERACTIONS
+    // 5. ANIMATIONS & TOUCH INTERACTIONS (PULL TO REFRESH INTEGRATED)
     // =========================================================================
 
     @SuppressLint("ClickableViewAccessibility")
@@ -504,19 +541,17 @@ class MainActivity : AppCompatActivity() {
                         if (!isPulling) {
                             startY = event.rawY
                             isPulling = true
+                            layoutStatus.visibility = View.VISIBLE
+                            ivStatusIcon.setImageResource(android.R.drawable.ic_popup_sync)
+                            // Saat ditarik, langsung tampilkan "Baru saja diperbarui"
+                            tvStatusText.text = "Baru saja diperbarui"
                         }
 
                         val dampedDelta = ((event.rawY - startY) * pullResistance).coerceAtLeast(0f)
                         pullContainer.translationY = dampedDelta
 
                         val progress = (dampedDelta / (pullThreshold * 0.8f)).coerceIn(0f, 1f)
-                        tvPullToRefresh.alpha = progress
-
-                        tvPullToRefresh.text = if (dampedDelta >= pullThreshold * 0.8f) {
-                            "Lepaskan untuk memperbarui"
-                        } else {
-                            "Tarik untuk memperbarui"
-                        }
+                        layoutStatus.alpha = progress
 
                         return@setOnTouchListener true
                     }
@@ -525,10 +560,11 @@ class MainActivity : AppCompatActivity() {
                     if (isPulling) {
                         val dampedDelta = (event.rawY - startY) * pullResistance
 
+                        // Jika ditarik melebihi batas, langsung masuk ke kondisi "Memperbarui..."
                         if (dampedDelta >= pullThreshold * 0.8f) {
                             isRefreshing = true
-                            tvPullToRefresh.text = "Memperbarui data..."
-                            pullContainer.animate().translationY(100f).setDuration(250).start()
+                            showStatusBanner(isLoading = true, isSuccess = false, message = "Memperbarui...")
+                            pullContainer.animate().translationY(0f).setDuration(250).start()
                             refreshCurrentWeatherData()
                         } else {
                             resetPullPosition()
@@ -543,7 +579,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun resetPullPosition() {
         pullContainer.animate().translationY(0f).setDuration(300).start()
-        tvPullToRefresh.animate().alpha(0f).setDuration(200).start()
+        if (!isRefreshing) {
+            layoutStatus.animate().alpha(0f).setDuration(200).withEndAction {
+                layoutStatus.visibility = View.GONE
+                layoutStatus.alpha = 1f
+            }.start()
+        }
         isRefreshing = false
     }
 

@@ -30,25 +30,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- ================================================================= -->
-    <!-- 2. PULL TO REFRESH INDICATOR                                      -->
-    <!-- ================================================================= -->
-    <TextView
-        android:id="@+id/tvPullToRefresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:alpha="0"
-        android:elevation="5dp"
-        android:text="Tarik untuk memperbarui"
-        android:textColor="#CCFFFFFF"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- ================================================================= -->
-    <!-- 3. HEADER NAVBAR (Teks Lokasi Rata Kiri & Aman Dari Icon Kanan)    -->
+    <!-- 2. HEADER NAVBAR (Teks Lokasi & Status Banner / Pull Info)        -->
     <!-- ================================================================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
@@ -61,7 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Judul Lokasi Rata Kiri (Tidak menabrak tombol kanan) -->
+        <!-- Judul Lokasi Rata Kiri -->
         <TextView
             android:id="@+id/tvLocation"
             android:layout_width="0dp"
@@ -76,10 +58,40 @@
             android:textColor="@android:color/white"
             android:textSize="24sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btnManageCities"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- STATUS BANNER / PULL INDICATOR (Menjadi 1 di Bawah Nama Lokasi) -->
+        <LinearLayout
+            android:id="@+id/layoutStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@id/btnManageCities"
+            app:layout_constraintStart_toStartOf="@id/tvLocation"
+            app:layout_constraintTop_toBottomOf="@id/tvLocation">
+
+            <ImageView
+                android:id="@+id/ivStatusIcon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:contentDescription="Status Icon"
+                android:src="@android:drawable/ic_popup_sync"
+                app:tint="#D9FFFFFF" />
+
+            <TextView
+                android:id="@+id/tvStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Memperbarui..."
+                android:textColor="#D9FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <!-- Tombol Kelola Kota -->
         <ImageView
@@ -92,9 +104,9 @@
             android:contentDescription="Manage Cities"
             android:focusable="true"
             android:src="@drawable/ic_add"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tvLocation"
             app:layout_constraintEnd_toStartOf="@id/btnSettings"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvLocation"
             app:tint="@android:color/white" />
 
         <!-- Tombol Settings -->
@@ -108,9 +120,9 @@
             android:contentDescription="Settings"
             android:focusable="true"
             android:src="@drawable/ic_set"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tvLocation"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvLocation"
             app:tint="@android:color/white" />
 
         <!-- SearchView Melayang Saat Pencarian Aktif -->
@@ -132,7 +144,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- ================================================================= -->
-    <!-- 4. KONTEN UTAMA (AREA SCROLLING & REFRESH)                         -->
+    <!-- 3. KONTEN UTAMA (AREA SCROLLING & REFRESH)                         -->
     <!-- ================================================================= -->
     <LinearLayout
         android:id="@+id/pullContainer"
