@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvCondition: TextView
     private lateinit var tvFeelsLike: TextView
 
-    // Status Banner Components (Di bawah Nama Lokasi)
+    // Status Banner Components
     private lateinit var layoutStatus: LinearLayout
     private lateinit var ivStatusIcon: ImageView
     private lateinit var tvStatusText: TextView
@@ -70,43 +70,47 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvSunrise: TextView
     private lateinit var tvSunset: TextView
 
-    // Top Navigation Views
+    // Top Navigation & Containers
     private lateinit var ivManageCities: ImageView
     private lateinit var ivSettings: ImageView
     private lateinit var nestedScrollView: NestedScrollView
-
-    // Custom Pull Container
     private lateinit var pullContainer: LinearLayout
-    private var isRefreshing = false
 
     // RecyclerViews
     private lateinit var rvHourlyForecast: RecyclerView
     private lateinit var rvDailyForecast: RecyclerView
 
-    // Active City / Coordinates State
+    // --- STATE VARIABLES ---
     private var currentCityName: String? = null
     private var currentLat: Double? = null
     private var currentLon: Double? = null
-
-    // BENDERA PENCEGAH BUG
     private var isCustomCitySelected = false
+    private var isRefreshing = false
 
-    // Permission Handler
+    // --- ACTIVITY LAUNCHERS ---
+
+    // Perbaikan Bug 1 & 2: Set nilai default saat izin ditolak agar tidak memicu dialog berulang
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val isGranted = permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) ||
                 permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false)
 
+        resetPullPosition()
+
         if (isGranted) {
             dapatkanLokasiPerangkat()
         } else {
+            // Set koordinat ke default agar state lokasi aktif dan tidak memicu cekAtauMintaIzinLokasi lagi
+            currentLat = defaultLat
+            currentLon = defaultLon
+            currentCityName = null
+
             showStatusBanner(isLoading = false, isSuccess = false, message = "Izin lokasi ditolak, memakai lokasi default")
             ambilDataCuaca(defaultLat, defaultLon)
         }
     }
 
-    // Launcher Result dari ManageCitiesActivity
     private val manageCitiesLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -129,6 +133,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // =========================================================================
+    // LIFECYCLE METHODS
+    // =========================================================================
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -143,7 +151,7 @@ class MainActivity : AppCompatActivity() {
         setupCustomPullToRefresh()
         setupHeaderButtons()
 
-        // Pertama kali buka, minta lokasi GPS
+        // Meminta izin lokasi saat aplikasi dibuka pertama kali
         cekAtauMintaIzinLokasi()
     }
 
@@ -180,6 +188,7 @@ class MainActivity : AppCompatActivity() {
         ivStatusIcon = findViewById(R.id.ivStatusIcon)
         tvStatusText = findViewById(R.id.tvStatusText)
 
+        // Weather Details
         tvHumidity = findViewById(R.id.tvHumidity)
         tvWind = findViewById(R.id.tvWind)
         tvPressure = findViewById(R.id.tvPressure)
@@ -187,9 +196,11 @@ class MainActivity : AppCompatActivity() {
         tvSunrise = findViewById(R.id.tvSunrise)
         tvSunset = findViewById(R.id.tvSunset)
 
+        // Header Buttons
         ivManageCities = findViewById(R.id.btnManageCities)
         ivSettings = findViewById(R.id.btnSettings)
 
+        // Forecast Lists
         rvHourlyForecast = findViewById(R.id.rvHourlyForecast)
         rvDailyForecast = findViewById(R.id.rvDailyForecast)
     }
@@ -223,13 +234,17 @@ class MainActivity : AppCompatActivity() {
         return sharedPref.getString("UNIT", "metric") ?: "metric"
     }
 
+    // Perbaikan Bug 2: Memastikan fungsi refresh tidak memanggil izin lagi jika koordinat belum ada
     private fun refreshCurrentWeatherData() {
         if (!currentCityName.isNullOrBlank()) {
             cariKota(currentCityName!!)
         } else if (currentLat != null && currentLon != null) {
             ambilDataCuaca(currentLat!!, currentLon!!)
         } else {
-            cekAtauMintaIzinLokasi()
+            // Jika izin ditolak dan koordinat kosong, langsung gunakan lokasi default tanpa minta izin lagi
+            currentLat = defaultLat
+            currentLon = defaultLon
+            ambilDataCuaca(defaultLat, defaultLon)
         }
     }
 
@@ -258,6 +273,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Perbaikan Bug 3: Tangani kondisi jika GPS mati/null dengan fallback lokasi default
     @SuppressLint("MissingPermission")
     private fun dapatkanLokasiPerangkat() {
         fusedLocationClient.lastLocation
@@ -273,6 +289,7 @@ class MainActivity : AppCompatActivity() {
                     currentLat = defaultLat
                     currentLon = defaultLon
                     currentCityName = null
+                    showStatusBanner(isLoading = false, isSuccess = false, message = "GPS tidak aktif, memakai lokasi default")
                     ambilDataCuaca(defaultLat, defaultLon)
                 }
             }
@@ -281,6 +298,7 @@ class MainActivity : AppCompatActivity() {
                 currentLat = defaultLat
                 currentLon = defaultLon
                 currentCityName = null
+                showStatusBanner(isLoading = false, isSuccess = false, message = "Gagal mengambil GPS, memakai lokasi default")
                 ambilDataCuaca(defaultLat, defaultLon)
             }
     }
@@ -442,7 +460,6 @@ class MainActivity : AppCompatActivity() {
             isSuccess -> {
                 ivStatusIcon.setImageResource(R.drawable.ic_check)
 
-                // Setelah 2 detik sukses, kembalikan status teks ke "Baru saja diperbarui"
                 Handler(Looper.getMainLooper()).postDelayed({
                     ivStatusIcon.setImageResource(android.R.drawable.ic_popup_sync)
                     tvStatusText.text = "Baru saja diperbarui"
@@ -516,7 +533,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // =========================================================================
-    // 5. ANIMATIONS & TOUCH INTERACTIONS (PULL TO REFRESH INTEGRATED)
+    // 5. ANIMATIONS & TOUCH INTERACTIONS
     // =========================================================================
 
     @SuppressLint("ClickableViewAccessibility")
@@ -543,7 +560,6 @@ class MainActivity : AppCompatActivity() {
                             isPulling = true
                             layoutStatus.visibility = View.VISIBLE
                             ivStatusIcon.setImageResource(android.R.drawable.ic_popup_sync)
-                            // Saat ditarik, langsung tampilkan "Baru saja diperbarui"
                             tvStatusText.text = "Baru saja diperbarui"
                         }
 
@@ -560,7 +576,6 @@ class MainActivity : AppCompatActivity() {
                     if (isPulling) {
                         val dampedDelta = (event.rawY - startY) * pullResistance
 
-                        // Jika ditarik melebihi batas, langsung masuk ke kondisi "Memperbarui..."
                         if (dampedDelta >= pullThreshold * 0.8f) {
                             isRefreshing = true
                             showStatusBanner(isLoading = true, isSuccess = false, message = "Memperbarui...")
