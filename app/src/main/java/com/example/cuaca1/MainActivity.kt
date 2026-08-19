@@ -88,8 +88,6 @@ class MainActivity : AppCompatActivity() {
     private var isRefreshing = false
 
     // --- ACTIVITY LAUNCHERS ---
-
-    // Perbaikan Bug 1 & 2: Set nilai default saat izin ditolak agar tidak memicu dialog berulang
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -101,7 +99,6 @@ class MainActivity : AppCompatActivity() {
         if (isGranted) {
             dapatkanLokasiPerangkat()
         } else {
-            // Set koordinat ke default agar state lokasi aktif dan tidak memicu cekAtauMintaIzinLokasi lagi
             currentLat = defaultLat
             currentLon = defaultLon
             currentCityName = null
@@ -151,7 +148,6 @@ class MainActivity : AppCompatActivity() {
         setupCustomPullToRefresh()
         setupHeaderButtons()
 
-        // Meminta izin lokasi saat aplikasi dibuka pertama kali
         cekAtauMintaIzinLokasi()
     }
 
@@ -234,14 +230,12 @@ class MainActivity : AppCompatActivity() {
         return sharedPref.getString("UNIT", "metric") ?: "metric"
     }
 
-    // Perbaikan Bug 2: Memastikan fungsi refresh tidak memanggil izin lagi jika koordinat belum ada
     private fun refreshCurrentWeatherData() {
         if (!currentCityName.isNullOrBlank()) {
             cariKota(currentCityName!!)
         } else if (currentLat != null && currentLon != null) {
             ambilDataCuaca(currentLat!!, currentLon!!)
         } else {
-            // Jika izin ditolak dan koordinat kosong, langsung gunakan lokasi default tanpa minta izin lagi
             currentLat = defaultLat
             currentLon = defaultLon
             ambilDataCuaca(defaultLat, defaultLon)
@@ -273,7 +267,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Perbaikan Bug 3: Tangani kondisi jika GPS mati/null dengan fallback lokasi default
     @SuppressLint("MissingPermission")
     private fun dapatkanLokasiPerangkat() {
         fusedLocationClient.lastLocation
@@ -325,7 +318,6 @@ class MainActivity : AppCompatActivity() {
 
                     updateUI(data)
                     updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
-                    forceRedrawUI()
 
                     ambilForecast(data.coord.lat, data.coord.lon)
 
@@ -363,7 +355,6 @@ class MainActivity : AppCompatActivity() {
 
                     updateUI(data)
                     updateBackground(data.weather.firstOrNull()?.icon ?: "01d")
-                    forceRedrawUI()
 
                     ambilForecast(data.coord.lat, data.coord.lon)
 
@@ -471,18 +462,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun forceRedrawUI() {
-        nestedScrollView.scrollTo(0, 0)
-
-        tvTemperature.alpha = 1f
-        ivWeatherIcon.alpha = 1f
-        tvFeelsLike.alpha = 1f
-        tvCondition.alpha = 1f
-
-        nestedScrollView.invalidate()
-        ivBackground.invalidate()
-    }
-
     private fun translateWeather(weather: String): String {
         return when (weather) {
             "Clear" -> "Cerah"
@@ -533,7 +512,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // =========================================================================
-    // 5. ANIMATIONS & TOUCH INTERACTIONS
+    // 5. ANIMATIONS & TOUCH INTERACTIONS (PERBAIKAN FLICKER)
     // =========================================================================
 
     @SuppressLint("ClickableViewAccessibility")
@@ -554,11 +533,11 @@ class MainActivity : AppCompatActivity() {
                 MotionEvent.ACTION_MOVE -> {
                     val deltaY = event.rawY - startY
 
+                    // Hanya cegah scroll jika beneran dalam posisi scroll 0 dan ditarik ke bawah
                     if (nestedScrollView.scrollY == 0 && deltaY > 0) {
                         if (!isPulling) {
                             startY = event.rawY
                             isPulling = true
-                            layoutStatus.visibility = View.VISIBLE
                             ivStatusIcon.setImageResource(android.R.drawable.ic_popup_sync)
                             tvStatusText.text = "Baru saja diperbarui"
                         }
@@ -570,6 +549,10 @@ class MainActivity : AppCompatActivity() {
                         layoutStatus.alpha = progress
 
                         return@setOnTouchListener true
+                    } else if (isPulling && deltaY <= 0) {
+                        // Jika swipe dibatalkan kembali ke atas
+                        isPulling = false
+                        pullContainer.translationY = 0f
                     }
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -595,16 +578,16 @@ class MainActivity : AppCompatActivity() {
     private fun resetPullPosition() {
         pullContainer.animate().translationY(0f).setDuration(300).start()
         if (!isRefreshing) {
-            layoutStatus.animate().alpha(0f).setDuration(200).withEndAction {
-                layoutStatus.visibility = View.GONE
-                layoutStatus.alpha = 1f
-            }.start()
+            layoutStatus.animate().alpha(0f).setDuration(200).start()
         }
         isRefreshing = false
     }
 
     private fun setupScrollFadeAnimation() {
         nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
+            // Menghindari perhitungan ulang jika tidak sedang scroll di area teratas
+            if (scrollY > 400) return@OnScrollChangeListener
+
             tvTemperature.alpha = 1f - (scrollY / 180f).coerceIn(0f, 1f)
 
             val midAlpha = 1f - (scrollY / 260f).coerceIn(0f, 1f)
